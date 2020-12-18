@@ -187,7 +187,7 @@ while lapsed < sessionLength:
             
         
 
-    time.sleep(0.05) # allow 20 licks per sec
+    time.sleep(0.1) # allow 20 licks per sec
     ina0 = mpr121.touched_pins[0]
     act1 = mpr121.touched_pins[1]
     lapsed = time.time() - sTime
