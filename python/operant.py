@@ -296,7 +296,7 @@ subprocess.call('sudo python ' + './turnoff_light.py &', shell=True)
 
 print(str(ids.devID) +  "Session" + str(ids.sesID) + " Done!\n")
 showData("final")
-subprocess.call('/home/pi/openbehavior/wifi-network/rsync.sh &', shell=True)
+subprocess.call('/home/pi/openbehavior/SocialDrinking/wifi-network/rsync.sh &', shell=True)
 print(ids.devID+  "Session"+ids.sesID + " Done!\n")
 showData("final")
 
