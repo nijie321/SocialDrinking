@@ -187,7 +187,7 @@ while lapsed < sessionLength:
             
         
 
-    time.sleep(0.1) # allow 20 licks per sec
+    time.sleep(0.050) # allow 20 licks per sec
     ina0 = mpr121.touched_pins[0]
     act1 = mpr121.touched_pins[1]
     lapsed = time.time() - sTime
@@ -296,7 +296,7 @@ subprocess.call('sudo python ' + './turnoff_light.py &', shell=True)
 
 print(str(ids.devID) +  "Session" + str(ids.sesID) + " Done!\n")
 showData("final")
-subprocess.call('/home/pi/openbehavior/wifi-network/rsync.sh &', shell=True)
+subprocess.call('/home/pi/openbehavior/SocialDrinking/wifi-network/rsync.sh &', shell=True)
 print(ids.devID+  "Session"+ids.sesID + " Done!\n")
 showData("final")
 

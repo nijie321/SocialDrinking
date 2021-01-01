@@ -131,6 +131,8 @@ backwardbtn.when_pressed = backward
 
 
 h=str(int(sessionLength/3600))
+sep="===================================\n  "
+print(sep+datetime+"\n"+sep)
 print("Run " + schedule + str(ratio) + "for "  + h + "h\n")
 
 rat1 = input("please scan rat1\n")[-8:]
