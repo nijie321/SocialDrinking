@@ -62,7 +62,13 @@ elif RatID[-2:] == "52" or RatID[-2:] == "8f":  #FR5 1h
     schedule="fr"
     ratio = 5
     timeout =  10
-    sessionLength=60*60*4 # one hour assay
+    sessionLength=60*60*1 # one hour assay
+    nextratio=ratio
+elif RatID[-2:] == "05" or RatID[-2:] == "c4":  #FR5 4h
+    schedule="fr"
+    ratio = 5
+    timeout =  10
+    sessionLength=60*60*4 # four hour assay
     nextratio=ratio
 elif RatID[-2:] == "6f" or RatID[-2:] == "b9": # FR5, 16h 
     schedule="fr"
