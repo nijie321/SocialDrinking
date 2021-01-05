@@ -42,6 +42,7 @@ command_ids = [
     "002c732f",
     "002b392d",
     "002cdfc3",
+    "00871805"
 ]
 
 while RatID not in command_ids:
