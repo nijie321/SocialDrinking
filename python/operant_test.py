@@ -123,8 +123,15 @@ minInterLickInterval=0.15 # minimal interlick interval (about 6-7 licks per seco
 maxISI = 15  # max lapse between RFID scan and first lick in a cluster 
 maxILI = 3 # max interval between licks used to turn an RFID into unknown.   
 
+
+pumptimedout={rat0ID:False, rat1ID:False, rat2ID:False}
 def resetPumpTimeout(rat):
+    print("timeout reset======================")
     pumptimedout[rat] = False
+    # rat.pumptimedup = False
+    
+    # rat[0].pumptimeup = False
+    # pumptimedout[rat] = False
 
 def get_ratid_scantime(fname, this_lick, act):
     try:
@@ -165,9 +172,7 @@ def houselight_check():
             houselight_on = True
             subprocess.call(blink_light_command, shell=True)
            
-        
          
-
 while lapsed < sessionLength:
     houselight_check()
 
@@ -185,6 +190,8 @@ while lapsed < sessionLength:
         (ratid, scantime) = get_ratid_scantime("/home/pi/_active", thisActiveLick, act=True)
         
         rat = rats[ratid] 
+        print("pumptimeout = {}".format(rat.pumptimedout))
+
         # if (thisActiveLick - rat.last_act_licks["time"] > maxILI) and (thisActiveLick - scantime > maxISI):
         #     rat = rats["ratUnknown"]
             
@@ -206,16 +213,18 @@ while lapsed < sessionLength:
 
             updateTime = time.time()
 
-        #blinkCueLED(0.2)
-        if not rat.pumptimedout:
+        # if not rat.pumptimedout:
+        if not pumptimedout[ratid]:
+        
             rat.incr_touch_counter()
 
             if rat.touch_counter >= rat.next_ratio and rat != "ratUnknown":
                 rat.incr_rewards()
                 rat.reset_touch_counter()
-                rat.pumptimeout = True
+                pumptimedout[ratid] = True
+                # rat.pumptimedout = True
 
-                pumpTimer = Timer(timeout, resetPumpTimeout, [rat])
+                pumpTimer = Timer(timeout, resetPumpTimeout, [ratid] )
                 print("timeout on " + rat.ratid)
                 pumpTimer.start()
 
@@ -227,7 +236,11 @@ while lapsed < sessionLength:
                 else:
                     dlogger.logEvent(rat.ratid, time.time()- scantime, "REWARD", time.time() - sTime)
                     mover = PumpMove()
-                    mover.move("forward")
+                    if(float(sessionLength) / 3600 == 16.0):
+                        mover.move("forward", 130)
+                    else:
+                        mover.move("forward", 150)
+
                     del(mover)
 
                 RatActivityCounter.show_data(ids, sessionLength, schedule, lapsed, \

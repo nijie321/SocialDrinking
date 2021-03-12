@@ -42,7 +42,7 @@ RFIDFILE = DATA_DIR + DATA_PREFIX + date + "_" + str(ids.devID)+ "_S"+str(ids.se
 
 if args.test:
     # RatID = "ef"
-    RatID = "002c94ef"
+    RatID = "002cd652"
 else:
     RatID = input("please scan a command RFID\n")[-8:]
 
@@ -61,10 +61,10 @@ class SessionInfo():
 
 command_ids = {
     ('3c', '88'): SessionInfo(schedule="pr", timeout=10, nextratio=int(5*2.72**(2/5)-5), sessionLength=20*60, ratio=""), # PR
-    ('52', '8f'): SessionInfo(schedule="fr", timeout=10, nextratio=5, sessionLength=60*60*1, ratio=5), # FR5 1h
+    ('52', '8f'): SessionInfo(schedule="fr", timeout=10, nextratio=5, sessionLength=60, ratio=5), # FR5 1h
     ('6f', 'b9'): SessionInfo(schedule="fr", timeout=10, nextratio=5, sessionLength=60*60*16, ratio=5), # FR5 16h
     ('65', '8c'): SessionInfo(schedule="ext", timeout=0, nextratio=1000000, sessionLength=60*60*1, ratio=1000000), # extinction
-    ('ef', 'a7'): SessionInfo(schedule="vr", timeout=10, nextratio=10, sessionLength=60, ratio=10), # VR10, 1h
+    ('ef', 'a7'): SessionInfo(schedule="vr", timeout=10, nextratio=10, sessionLength=60*60*1, ratio=10), # VR10, 1h
     ('b8', '7e'): SessionInfo(schedule="vr", timeout=10, nextratio=10, sessionLength=60*60*2, ratio=10), # VR10, 2h
     ('9a', '2f'): SessionInfo(schedule="vr", timeout=10, nextratio=10, sessionLength=60*60*4, ratio=10), # VR10, 4h
     ('ff', '2d'): SessionInfo(schedule="vr", timeout=1, nextratio=5, sessionLength=60*60*4, ratio=5), # VRreinstate, 4h
@@ -78,24 +78,7 @@ for key in command_ids.keys():
     if RatID[-2:] in key:
         sess_info = command_ids[key]
     
-mover = PumpMove()
-forwardbtn = Button("GPIO5")
-backwardbtn = Button("GPIO27")
-
-BACKWARD_LIMIT_BTN = "GPIO23"
-BACKWARD_LIMIT = DigitalInputDevice(BACKWARD_LIMIT_BTN)
-
-def forward():
-    while forwardbtn.value == 1:
-        mover.move("forward")
-
-def backward():
-    while BACKWARD_LIMIT.value != 1:
-        mover.move("backward")
-
-forwardbtn.when_pressed = forward
-backwardbtn.when_pressed = backward
-
+# mover = PumpMove()
 # forwardbtn = Button("GPIO5")
 # backwardbtn = Button("GPIO27")
 
@@ -142,7 +125,7 @@ sTime=time.time()
 lapsed=0
 
 # delete mover to prevent overheating
-del(mover)
+# del(mover)
 
 subprocess.call("python3 operant_test.py " + \
                 "-schedule " + schedule + \
