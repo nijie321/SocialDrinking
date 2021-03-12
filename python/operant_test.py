@@ -31,6 +31,7 @@ parser.add_argument('-sessionLength',  type=int, default=3600)
 parser.add_argument('-timeout',  type=int, default=20)
 parser.add_argument('-rat1ID',  type=str, default="rat1")
 parser.add_argument('-rat2ID',  type=str, default="rat2")
+parser.add_argument('-rfidFile',  type=str)
 args=parser.parse_args()
 
 # exp setting
@@ -41,6 +42,8 @@ timeout=args.timeout
 rat1ID=args.rat1ID
 rat2ID=args.rat2ID
 rat0ID="ratUnknown"
+
+rfid_file=args.rfidFile
 
 ## initiate pump motor
 pi = pigpio.pi()
@@ -126,8 +129,10 @@ def resetPumpTimeout(rat):
 def get_ratid_scantime(fname, this_lick, act):
     try:
         with open(fname, "r") as f:
-            (rat, scantime, dummy1, dummy1) = f.read().strip().split("\t")
+            # print(f.read())
+            (rat, scantime, dummy1, dummy2, dummy3) = f.read().strip().split("\t")
             scantime = float(scantime)
+            # print(rat, scantime, dummy1, dummy1)
     except:
         rat = "ratUnknown"
         scantime = 0
@@ -137,6 +142,7 @@ def get_ratid_scantime(fname, this_lick, act):
         else:
             rat_obj = rats[rat]
             if act:
+                # print("this_lick = {}\t rat_obj.last_act_licks = {}\t scantime = {}\t".format(this_lick, rat_obj.last_act_licks["time"], scantime))
                 if this_lick - rat_obj.last_act_licks["time"] > maxILI and this_lick - scantime > maxISI:
                     rat = "ratUnknown"
             else:
@@ -151,10 +157,12 @@ def get_ratid_scantime(fname, this_lick, act):
         
 houselight_on = False
 def houselight_check():
+    global houselight_on
     blink_light_command = "sudo python ./blinkenlights.py &"
     if not FORWARD_LIMIT_REACHED:
-        if (time.localtime().tm_hour >= 21 and houselight_on is False) or \
-           (time.localtime().tm_hour >= 9 and time.localtime().tm_hour < 21) and houselight_on:
+        if (time.localtime().tm_hour >= 21 and houselight_on is False) or (time.localtime().tm_hour >= 9 and time.localtime().tm_hour < 21) and houselight_on:
+            print("inside houselight check")
+            houselight_on = True
             subprocess.call(blink_light_command, shell=True)
            
         
@@ -175,7 +183,7 @@ while lapsed < sessionLength:
         thisActiveLick=time.time()
         
         (ratid, scantime) = get_ratid_scantime("/home/pi/_active", thisActiveLick, act=True)
-
+        
         rat = rats[ratid] 
         # if (thisActiveLick - rat.last_act_licks["time"] > maxILI) and (thisActiveLick - scantime > maxISI):
         #     rat = rats["ratUnknown"]
@@ -187,9 +195,9 @@ while lapsed < sessionLength:
         else:
             rat.incr_active_licks()
             if FORWARD_LIMIT_REACHED:
-                dlogger.logEvent(rat, time.time(), "syringe empty", time.time() - sTime) 
+                dlogger.logEvent(rat.ratid, time.time(), "syringe empty", time.time() - sTime) 
             else:
-                dlogger.logEvent(rat, time.time() - rat.last_act_licks["scantime"], "ACTIVE", lapsed, rat.next_ratio) # add next ratio
+                dlogger.logEvent(rat.ratid, time.time() - rat.last_act_licks["scantime"], "ACTIVE", lapsed, rat.next_ratio) # add next ratio
 
             rat.update_last_licks(thisActiveLick, scantime, act=True)
             
@@ -206,15 +214,18 @@ while lapsed < sessionLength:
                 rat.incr_rewards()
                 rat.reset_touch_counter()
                 rat.pumptimeout = True
-                # pumpTimer
-                print("timeout on {}".format(rat))
-                # pumpTimer.start()
-                subprocess.call('python ' + './blinkenlights.py -times 1&', shell=True)
+
+                pumpTimer = Timer(timeout, resetPumpTimeout, [rat])
+                print("timeout on " + rat.ratid)
+                pumpTimer.start()
+
+                if not FORWARD_LIMIT_REACHED:
+                    subprocess.call('sudo python ' + './blinkenlights.py -reward_happened True&', shell=True)
 
                 if FORWARD_LIMIT_REACHED:
-                    dlogger.logEvent(rat,time.time(), "syringe empty", time.time() - sTime)
+                    dlogger.logEvent(rat.ratid,time.time(), "syringe empty", time.time() - sTime)
                 else:
-                    dlogger.logEvent(rat, time.time()- scantime, "REWARD", time.time() - sTime)
+                    dlogger.logEvent(rat.ratid, time.time()- scantime, "REWARD", time.time() - sTime)
                     mover = PumpMove()
                     mover.move("forward")
                     del(mover)
@@ -245,7 +256,7 @@ while lapsed < sessionLength:
             rat.update_last_licks(thisInactiveLick, scantime, act=False)
         else:
             rat.incr_inactive_licks()
-            dlogger.logEvent(rat,time.time() - lastInactiveLick["scantime"], "INACTIVE", lapsed)
+            dlogger.logEvent(rat.ratid,time.time() - rat.last_inact_licks["scantime"], "INACTIVE", lapsed)
             rat.update_last_licks(thisInactiveLick, scantime, act=False)
 
             RatActivityCounter.show_data(ids, sessionLength, schedule, lapsed, \
@@ -268,13 +279,21 @@ date=time.strftime("%Y-%m-%d", time.localtime())
 formatted_schedule = schedule+str(ratio)+'TO'+str(timeout)+"_"+ rat1ID+"_"+rat2ID
 schedule_to = schedule+str(ratio)+'TO'+str(timeout)
 finallog_fname = "Soc_{}_{}_S{}_{}_summary.tab".format(date,ids.devID,ids.sesID,formatted_schedule)
+
+rat1 = rats[rat1ID]
+rat2 = rats[rat2ID]
+rat0 = rats[rat0ID]
+
 data_dict = {
-            "ratID1":[rat1ID, date,ids.devID,ids.sesID,schedule_to,sessionLength,act[rat1ID],ina[rat1ID],rew[rat1ID]],
-            "ratID2":[rat2ID, date,ids.devID,ids.sesID,schedule_to,sessionLength,act[rat2ID],ina[rat2ID],rew[rat2ID]],
-            "ratID0":[rat0ID, date,ids.devID,ids.sesID,schedule_to,sessionLength,act[rat0ID],ina[rat0ID],rew[rat0ID]]
+            # "ratID1":[rat1ID, date,ids.devID,ids.sesID,schedule_to,sessionLength,act[rat1ID],ina[rat1ID],rew[rat1ID]],
+            "ratID1":[rat1ID, date,ids.devID,ids.sesID,schedule_to,sessionLength,rat1.active_licks,rat1.inactive_licks,rat1.rewards],
+            # "ratID2":[rat2ID, date,ids.devID,ids.sesID,schedule_to,sessionLength,act[rat2ID],ina[rat2ID],rew[rat2ID]],
+            "ratID2":[rat2ID, date,ids.devID,ids.sesID,schedule_to,sessionLength,rat2.active_licks,rat2.inactive_licks,rat2.rewards],
+            # "ratID0":[rat0ID, date,ids.devID,ids.sesID,schedule_to,sessionLength,act[rat0ID],ina[rat0ID],rew[rat0ID]]
+            "ratID0":[rat0ID, date,ids.devID,ids.sesID,schedule_to,sessionLength,rat0.active_licks,rat0.inactive_licks,rat0.rewards]
             }
 
-LickLogger.finalLog(finallog_fname, data_dict)
+LickLogger.finalLog(finallog_fname, data_dict, rfid_file)
 
 
 print(str(ids.devID) +  "Session" + str(ids.sesID) + " Done!\n")
@@ -282,4 +301,4 @@ RatActivityCounter.show_data(ids, sessionLength, schedule, lapsed, \
                         rats[rat1ID],rats[rat2ID],rats[rat0ID], "final")
 
 subprocess.call('/home/pi/openbehavior/wifi-network/rsync.sh &', shell=True)
-print(ids.devID+  "Session"+ids.sesID + " Done!\n")
+print(ids.devID+  "Session"+ str(ids.sesID) + " Done!\n")

@@ -17,11 +17,18 @@ class RatActivityCounter():
     # @staticmethod 
     def update_last_licks(self, lick_time, scan_time, act):
         if act:
-            self.active_licks["time"] = lick_time
-            self.active_licks["scantime"] = scan_time
+            # print(lick_time)
+            # print(type(lick_time))
+            self.last_act_licks["time"] = lick_time
+            self.last_act_licks["scantime"] = scan_time
+            # self.active_licks["time"] = lick_time
+            # self.active_licks["scantime"] = scan_time
         else:
-            self.inactive_licks["time"] = lick_time
-            self.inactive_licks["scantime"] = scan_time
+            self.last_inact_licks["time"] = lick_time
+            self.last_inact_licks["scantime"] = scan_time
+
+            # self.inactive_licks["time"] = lick_time
+            # self.inactive_licks["scantime"] = scan_time
 
         # self.last_inact_licks
         # lick_dict["time"] = lick_time
@@ -72,16 +79,20 @@ class RatActivityCounter():
 
 
     def incr_rewards(self):
-        self.rewards = self.rewards + 1
+        self.rewards += 1
+#self.rewards + 1
 
     def incr_active_licks(self):
-        self.active_licks = self.active_licks + 1
+        self.active_licks += 1
+#self.active_licks + 1
 
     def incr_inactive_licks(self):
-        self.inactive_licks = self.inactive_licks + 1
+        self.inactive_licks +=  1
+#self.inactive_licks + 1
 
     def incr_touch_counter(self):
-        self. touch_counter = self.touch_counter + 1
+        self. touch_counter += 1 
+#= self.touch_counter + 1
 
     def reset_touch_counter(self):
         self.touch_counter = 0

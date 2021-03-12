@@ -12,6 +12,20 @@ from gpiozero import DigitalInputDevice
 from config import DATA_DIR, DATA_PREFIX, COMMAND_IDS, ROOT
 
 
+import argparse
+
+parser=argparse.ArgumentParser()
+parser.add_argument('-test',  type=bool, default=False)
+# parser.add_argument('-ratio',  type=int, default=10)
+# parser.add_argument('-sessionLength',  type=int, default=3600)
+# parser.add_argument('-timeout',  type=int, default=20)
+# parser.add_argument('-rat1ID',  type=str, default="rat1")
+# parser.add_argument('-rat2ID',  type=str, default="rat2")
+# parser.add_argument('-rfidFile',  type=str)
+args=parser.parse_args()
+
+
+
 
 
 # get date and time 
@@ -26,13 +40,17 @@ ids.sessionIncrement()
 # file to store RFID scann times
 RFIDFILE = DATA_DIR + DATA_PREFIX + date + "_" + str(ids.devID)+ "_S"+str(ids.sesID)+ "_RFID.csv"
 
-RatID = input("please scan a command RFID\n")[-8:]
+if args.test:
+    # RatID = "ef"
+    RatID = "002c94ef"
+else:
+    RatID = input("please scan a command RFID\n")[-8:]
 
-rat_id = input("please scan a command RFID\n")[-8:]
+# rat_id = input("please scan a  RFID\n")[-8:]
 
 
 class SessionInfo():
-    def init(self, schedule, timeout, nextratio, sessionLength, ratio):
+    def __init__(self, schedule, timeout, nextratio, sessionLength, ratio):
         self.schedule = schedule
         self.timeout = timeout
         self.nextratio = nextratio
@@ -46,7 +64,7 @@ command_ids = {
     ('52', '8f'): SessionInfo(schedule="fr", timeout=10, nextratio=5, sessionLength=60*60*1, ratio=5), # FR5 1h
     ('6f', 'b9'): SessionInfo(schedule="fr", timeout=10, nextratio=5, sessionLength=60*60*16, ratio=5), # FR5 16h
     ('65', '8c'): SessionInfo(schedule="ext", timeout=0, nextratio=1000000, sessionLength=60*60*1, ratio=1000000), # extinction
-    ('ef', 'a7'): SessionInfo(schedule="vr", timeout=10, nextratio=10, sessionLength=60*60*1, ratio=10), # VR10, 1h
+    ('ef', 'a7'): SessionInfo(schedule="vr", timeout=10, nextratio=10, sessionLength=60, ratio=10), # VR10, 1h
     ('b8', '7e'): SessionInfo(schedule="vr", timeout=10, nextratio=10, sessionLength=60*60*2, ratio=10), # VR10, 2h
     ('9a', '2f'): SessionInfo(schedule="vr", timeout=10, nextratio=10, sessionLength=60*60*4, ratio=10), # VR10, 4h
     ('ff', '2d'): SessionInfo(schedule="vr", timeout=1, nextratio=5, sessionLength=60*60*4, ratio=5), # VRreinstate, 4h
@@ -61,6 +79,40 @@ for key in command_ids.keys():
         sess_info = command_ids[key]
     
 mover = PumpMove()
+forwardbtn = Button("GPIO5")
+backwardbtn = Button("GPIO27")
+
+BACKWARD_LIMIT_BTN = "GPIO23"
+BACKWARD_LIMIT = DigitalInputDevice(BACKWARD_LIMIT_BTN)
+
+def forward():
+    while forwardbtn.value == 1:
+        mover.move("forward")
+
+def backward():
+    while BACKWARD_LIMIT.value != 1:
+        mover.move("backward")
+
+forwardbtn.when_pressed = forward
+backwardbtn.when_pressed = backward
+
+# forwardbtn = Button("GPIO5")
+# backwardbtn = Button("GPIO27")
+
+# BACKWARD_LIMIT_BTN = "GPIO23"
+# BACKWARD_LIMIT = DigitalInputDevice(BACKWARD_LIMIT_BTN)
+
+# def forward():
+#     while forwardbtn.value == 1:
+#         mover.move("forward")
+
+# def backward():
+#     while BACKWARD_LIMIT.value != 1:
+#         mover.move("backward")
+
+# forwardbtn.when_pressed = forward
+# backwardbtn.when_pressed = backward
+
 
 sessionLength = sess_info.sessionLength
 ratio = sess_info.ratio
@@ -92,7 +144,18 @@ lapsed=0
 # delete mover to prevent overheating
 del(mover)
 
-subprocess.call("python3 operant_test.py -schedule {} -ratio {} -sessionLength {} -rat1ID {} -rat2ID {} -timeout {} &".format(schedule, str(ratio), str(sessionLength), rat1, rat2, str(timeout), shell=True))
+subprocess.call("python3 operant_test.py " + \
+                "-schedule " + schedule + \
+                " -ratio " + str(ratio)  + \
+                " -sessionLength " + str(sessionLength) + \
+                " -rat1ID " + str(rat1) + \
+                " -rat2ID " + str(rat2) + \
+                " -timeout " + str(timeout) + \
+                " -rfidFile " + RFIDFILE + \
+                " &",
+                shell=True
+                )
+# subprocess.call("python3 operant_test.py -schedule {} -ratio {} -sessionLength {} -rat1ID {} -rat2ID {} -timeout {} &".format(schedule, str(ratio), str(sessionLength), rat1, rat2, str(timeout), shell=True))
 
 poke_counts = {rat1:{"act": 0, "inact": 0}, rat2:{"act":0, "inact":0}}
 
@@ -119,6 +182,7 @@ while lapsed < sessionLength:
         temp_rfid = rfid[-8:]
         poke_counts[temp_rfid]["inact"] = poke_counts[temp_rfid]["inact"] + 1
         record = file_format.format(temp_rfid, str(time.time()), "inactive", str(lapsed), str(poke_counts[temp_rfid]["inact"]))
+        print(record)
         record_data(fname=ROOT+"/_inactive",mode="w+",record=record)
         record_data(fname=RFIDFILE, mode="a+", record=record)
             
@@ -129,6 +193,7 @@ while lapsed < sessionLength:
         except KeyError as e:
             print("error occured: {}".format(e))
 
-        record = file_format.format(temp_rfid, str(time.time()), "active", str(lapsed), str(poke_counts[rfid]["act"]))
+        record = file_format.format(rfid, str(time.time()), "active", str(lapsed), str(poke_counts[rfid]["act"]))
+        print(record)
         record_data(fname=ROOT+"/_active",mode="w+",record=record)
         record_data(fname=RFIDFILE,mode="a+", record=record)
