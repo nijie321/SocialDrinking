@@ -123,7 +123,7 @@ elif RatID[-2:] == "8e" or RatID[-2:] == "c3": # vr10 16h
     nextratio=ratio
     timeout = 10
     sessionLength=60*60*16
-elif RatID[-2:] == "6b" or ratID[-2:] == "ba":
+elif RatID[-2:] == "6b" or RatID[-2:] == "ba":
     TEST_SESSION = True
     
 
