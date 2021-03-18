@@ -9,10 +9,6 @@ import adafruit_mpr121
 
 
 def pump_test():
-
-    # placeholder
-    command = "123"
-
     # command = input("Please scan the ")
     act_count = 0
     while command == "123":
