@@ -7,11 +7,15 @@ import board
 import busio
 import adafruit_mpr121
 
+import time
+
+# import RPi.GPIO as gpio
+# gpio.setwarnings(False)
+# gpio.setmode(gpio.BCM)
 
 def pump_test():
     # command = input("Please scan the ")
     act_count = 0
-
     i2c = busio.I2C(board.SCL, board.SDA)
     mpr121 = adafruit_mpr121.MPR121(i2c)
 
@@ -33,10 +37,13 @@ def pump_test():
     forwardbtn.when_pressed = forward
     backwardbtn.when_pressed = backward
 
-    act = mpr121.touched_pins[1]
     
-    if act:
-        if act_count % 5 == 0:
-            mover.move("forward")
-            act_count = 0
-        act_count += 1
+    while True:
+        time.sleep(0.050) # allow 20 licks per sec
+        act = mpr121.touched_pins[1]
+        if act:
+            print("act_count = ", act_count)
+            if act_count % 5 == 0:
+                mover.move("forward")
+                act_count = 0
+            act_count += 1
