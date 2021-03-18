@@ -14,7 +14,11 @@ import time
 # gpio.setmode(gpio.BCM)
 
 def pump_test():
-    # command = input("Please scan the ")
+    step = 0
+    with open("/home/pi/step", "r") as f:
+        step = int(f.read().strip())
+        
+    # command = input("Please scan the ") 
     act_count = 0
     i2c = busio.I2C(board.SCL, board.SDA)
     mpr121 = adafruit_mpr121.MPR121(i2c)
@@ -44,6 +48,8 @@ def pump_test():
         if act:
             print("act_count = ", act_count)
             if act_count % 5 == 0:
-                mover.move("forward")
+                for i in range(5):
+                    mover.move("forward", step)
+                    print("step = ", step)
                 act_count = 0
             act_count += 1
