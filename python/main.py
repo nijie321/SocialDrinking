@@ -24,6 +24,7 @@ RFIDFILE=DATA_DIR + DATA_PREFIX + date + "_" + str(ids.devID)+ "_S"+str(ids.sesI
 
 RatID=input("please scan a command RFID\n")[-8:]
 
+
 command_ids = [
     "0084cb3c",
     "002cd652",
@@ -129,6 +130,12 @@ elif RatID[-2:] == "6b" or ratID[-2:] == "ba":
 if TEST_SESSION:
     pump_test()
 else:
+    # 20ML motor step
+    motor_step = ""
+    with open(MOTOR_STEP_FILE, 'r') as f:
+        motor_step = f.read().strip()
+        print(motor_step)
+
 #### PUMP and BUTTON
 # start the pump after the command ID is scanned
     mover = PumpMove()
@@ -170,7 +177,7 @@ else:
 # delete mover to prevent overheating
     del(mover)
 
-    subprocess.call("python3 operant.py -schedule " +schedule+ " -ratio " +str(ratio)+ " -sessionLength " + str(sessionLength) + " -rat1ID " + rat1 + " -rat2ID " + rat2 + " -timeout " + str(timeout) +   " & ", shell=True)
+    subprocess.call("python3 operant.py -schedule " +schedule+ " -ratio " +str(ratio)+ " -sessionLength " + str(sessionLength) + " -rat1ID " + rat1 + " -rat2ID " + rat2 + " -timeout " + str(timeout) + " -motorStep " + motor_step +  " & ", shell=True)
 
     poke_counts = {rat1:{"act": 0, "inact": 0}, rat2:{"act":0, "inact":0}}
 

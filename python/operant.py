@@ -27,6 +27,7 @@ parser.add_argument('-sessionLength',  type=int, default=3600)
 parser.add_argument('-timeout',  type=int, default=20)
 parser.add_argument('-rat1ID',  type=str, default="rat1")
 parser.add_argument('-rat2ID',  type=str, default="rat2")
+parser.add_argument('-motorStep',  type=int, default=180)
 args=parser.parse_args()
 
 # exp setting
@@ -237,10 +238,7 @@ while lapsed < sessionLength:
                 else:
                     dlogger.logEvent(rat, time.time()-scantime, "REWARD", time.time()-sTime)
                     mover = PumpMove()
-                    if(float(sessionLength) / 3600  == 16.0):
-                        mover.move("forward", 130) # 20ML syringe 60µL solution
-                    else:
-                        mover.move("forward", 150) # 10ML syringe 60µL solution
+                    mover.move("forward", args.motorStep)
                     del(mover)
                 updateTime=showData()
                 if schedule == "fr":
