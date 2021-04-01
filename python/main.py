@@ -48,7 +48,11 @@ command_ids = [
     
     # test ID
     "0084c36b",
-    "008773ba"
+    "008773ba",
+
+    # fr5timeout10
+    "002c1aa3",
+    "002ce87b"
 ]
 
 TEST_SESSION = False
@@ -67,6 +71,12 @@ if RatID[-2:] == "3c" or RatID[-2:] == "88": # PR
     #signal motion sensor to keep recording until this is changed
     with open ("ROOT/prend", "w") as f:
         f.write("no")
+elif RatID[-2:] == "7b" or RatID[-2:] == "a3": # FR5 30min
+    schedule="fr"
+    ratio = 5
+    timeout = 10
+    sessionLength = 60 * 60 * .5
+    nextratio = ratio
 elif RatID[-2:] == "52" or RatID[-2:] == "8f":  #FR5 1h
     schedule="fr"
     ratio = 5
@@ -125,6 +135,7 @@ elif RatID[-2:] == "8e" or RatID[-2:] == "c3": # vr10 16h
     sessionLength=60*60*16
 elif RatID[-2:] == "6b" or RatID[-2:] == "ba":
     TEST_SESSION = True
+    
     
 
 if TEST_SESSION:
