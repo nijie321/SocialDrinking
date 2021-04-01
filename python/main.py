@@ -75,7 +75,7 @@ elif RatID[-2:] == "7b" or RatID[-2:] == "a3": # FR5 30min
     schedule="fr"
     ratio = 5
     timeout = 10
-    sessionLength = 60 * 60 * .5
+    sessionLength = 60 * 30
     nextratio = ratio
 elif RatID[-2:] == "52" or RatID[-2:] == "8f":  #FR5 1h
     schedule="fr"
