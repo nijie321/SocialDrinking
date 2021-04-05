@@ -18,10 +18,6 @@ parser.add_argument('-test',  type=bool, default=False)
 
 args=parser.parse_args()
 
-
-
-
-
 # get date and time 
 datetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 date=time.strftime("%Y-%m-%d", time.localtime())
@@ -51,36 +47,6 @@ while(len(sessioninfo) == 0):
     
 sessioninfo = sessioninfo[0]
 
-# class SessionInfo():
-#     def __init__(self, schedule, timeout, nextratio, sessionLength, ratio):
-#         self.schedule = schedule
-#         self.timeout = timeout
-#         self.nextratio = nextratio
-#         self.sessionLength = sessionLength
-#         self.ratio = ratio
-#         self.nextratio = nextratio
-
-
-# command_ids = {
-#     ('3c', '88'): SessionInfo(schedule="pr", timeout=10, nextratio=int(5*2.72**(2/5)-5), sessionLength=20*60, ratio=""), # PR
-#     ('52', '8f'): SessionInfo(schedule="fr", timeout=10, nextratio=5, sessionLength=60, ratio=5), # FR5 1h
-#     ('6f', 'b9'): SessionInfo(schedule="fr", timeout=10, nextratio=5, sessionLength=60*60*16, ratio=5), # FR5 16h
-#     ('65', '8c'): SessionInfo(schedule="ext", timeout=0, nextratio=1000000, sessionLength=60*60*1, ratio=1000000), # extinction
-#     ('ef', 'a7'): SessionInfo(schedule="vr", timeout=10, nextratio=10, sessionLength=60*60*1, ratio=10), # VR10, 1h
-#     ('b8', '7e'): SessionInfo(schedule="vr", timeout=10, nextratio=10, sessionLength=60*60*2, ratio=10), # VR10, 2h
-#     ('9a', '2f'): SessionInfo(schedule="vr", timeout=10, nextratio=10, sessionLength=60*60*4, ratio=10), # VR10, 4h
-#     ('ff', '2d'): SessionInfo(schedule="vr", timeout=1, nextratio=5, sessionLength=60*60*4, ratio=5), # VRreinstate, 4h
-#     ('8e', 'c3'): SessionInfo(schedule="vr", timeout=10, nextratio=10, sessionLength=60*60*16, ratio=10), # VR10 16h
-# }
-
-# while RatID not in COMMAND_IDS:
-#     RatID = input("command ID not found, please rescan the id: ")[-8:]
-
-# for key in command_ids.keys():
-#     if RatID[-2:] in key:
-#         sess_info = command_ids[key]
-    
-
 
 # ----------------------------------------------------------------------------------------------------
 
@@ -108,11 +74,6 @@ schedule = sessioninfo[0]
 timeout = sessioninfo[1]
 ratio = sessioninfo[2]
 sessionLength = int(sessioninfo[4])
-
-# sessionLength = sess_info.sessionLength
-# ratio = sess_info.ratio
-# timeout = sess_info.timeout
-# schedule = sess_info.schedule
 
 
 print("Run {} {} for {} hour \n".format(schedule, str(ratio), str(int(sessionLength/3600))))
