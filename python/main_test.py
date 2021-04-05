@@ -107,7 +107,7 @@ sessioninfo = sessioninfo[0]
 schedule = sessioninfo[0]
 timeout = sessioninfo[1]
 ratio = sessioninfo[2]
-sessionLength = sessioninfo[4]
+sessionLength = int(sessioninfo[4])
 
 # sessionLength = sess_info.sessionLength
 # ratio = sess_info.ratio
