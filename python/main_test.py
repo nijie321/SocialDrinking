@@ -9,8 +9,7 @@ from gpiozero import Button
 from pump_move import PumpMove
 from gpiozero import DigitalInputDevice
 
-from config import DATA_DIR, DATA_PREFIX, COMMAND_IDS, ROOT
-
+from config import DATA_DIR, DATA_PREFIX, COMMAND_IDS, ROOT, get_sessioninfo
 
 import argparse
 

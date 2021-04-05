@@ -8,6 +8,18 @@ DATA_DIR = "{}/{}".format(ROOT, "SocialDrinking")
 DATA_PREFIX = "Soc"
 
 
+def get_sessioninfo(config_fname, sessionid):
+    with open(config_fname, "r") as f:
+        csv_data = f.read().split("\n")
+        
+    sessioninfo = [info for info in csv_data[1:] if sessionid in info.split(",")[:2]]
+
+    if len(sessioninfo) < 1:
+        raise IndexError
+    else:
+        return sessioninfo
+    
+
 COMMAND_IDS = [
     "0084cb3c",
     "002cd652",
@@ -27,4 +39,12 @@ COMMAND_IDS = [
     "002c732f",
     "002b392d",
     "002cdfc3",
+
+    # test ID
+    "0084c36b",
+    "008773ba",
+
+    # fr5timeout10
+    "002c1aa3",
+    "002ce87b",
 ]
