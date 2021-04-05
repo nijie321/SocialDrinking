@@ -7,17 +7,19 @@ ROOT = "/home/pi"
 DATA_DIR = "{}/{}".format(ROOT, "SocialDrinking")
 DATA_PREFIX = "Soc"
 
+CONFIG_FILE = "session_configuration.csv"
 
-def get_sessioninfo(config_fname, sessionid):
-    with open(config_fname, "r") as f:
+def get_sessioninfo(sessionid):
+    with open(CONFIG_FILE, "r") as f:
         csv_data = f.read().split("\n")
         
-    sessioninfo = [info for info in csv_data[1:] if sessionid in info.split(",")[:2]]
+    sessioninfo = [info.split(",")[2:] for info in csv_data[1:] if sessionid in info.split(",")[:2]]
 
-    if len(sessioninfo) < 1:
-        raise IndexError
-    else:
-        return sessioninfo
+    return sessioninfo
+    # if len(sessioninfo) < 1:
+    #     raise IndexError
+    # else:
+    #     return sessioninfo[0]
     
 
 COMMAND_IDS = [
