@@ -34,7 +34,7 @@ class IDS:
             #sessID.write(str(newSesID))
             #sessID.close()
     def sessionIncrement(self):
-        f = open(JSON_CONFIG_FILE, 'r')
+        f = open(JSON_CONFIG_FILE, 'w')
         
         json.dump({
             "deviceid": self.devID,
