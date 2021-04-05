@@ -124,14 +124,10 @@ maxISI = 15  # max lapse between RFID scan and first lick in a cluster
 maxILI = 3 # max interval between licks used to turn an RFID into unknown.   
 
 
-pumptimedout={rat0ID:False, rat1ID:False, rat2ID:False}
 def resetPumpTimeout(rat):
-    print("timeout reset======================")
+    # don't delete this line
     pumptimedout[rat] = False
-    # rat.pumptimedup = False
-    
-    # rat[0].pumptimeup = False
-    # pumptimedout[rat] = False
+    rats[rat].pumptimedout = False
 
 def get_ratid_scantime(fname, this_lick, act):
     try:
@@ -221,10 +217,15 @@ while lapsed < sessionLength:
             if rat.touch_counter >= rat.next_ratio and rat != "ratUnknown":
                 rat.incr_rewards()
                 rat.reset_touch_counter()
+
+                # don't delete this line
                 pumptimedout[ratid] = True
-                # rat.pumptimedout = True
+
+                rats[ratid].pumptimedout = True
 
                 pumpTimer = Timer(timeout, resetPumpTimeout, [ratid] )
+                # pumpTimer = Timer(timeout, resetPumpTimeout, ratid )
+
                 print("timeout on " + rat.ratid)
                 pumpTimer.start()
 
