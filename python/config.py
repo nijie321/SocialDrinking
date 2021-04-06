@@ -4,7 +4,7 @@ BASE_DIR = "./SocialDrink"
 
 
 ROOT = "/home/pi"
-DATA_DIR = "{}/{}".format(ROOT, "SocialDrinking")
+DATA_DIR = "{}/{}/".format(ROOT, "SocialDrinking")
 DATA_PREFIX = "Soc"
 
 CONFIG_FILE = "session_configuration.csv"
