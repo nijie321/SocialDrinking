@@ -13,6 +13,8 @@ from config import DATA_DIR, DATA_PREFIX, COMMAND_IDS, ROOT, get_sessioninfo
 
 import argparse
 
+from PumpTest import pump_test
+
 parser=argparse.ArgumentParser()
 parser.add_argument('-test',  type=bool, default=False)
 
@@ -25,6 +27,10 @@ date=time.strftime("%Y-%m-%d", time.localtime())
 # get device and session ids
 ids = IDS()
 ids.sessionIncrement()
+
+motor_step = ids.step
+
+TEST_SESSION = False
 
 
 # file to store RFID scann times
@@ -46,9 +52,6 @@ while(len(sessioninfo) == 0):
 
     
 sessioninfo = sessioninfo[0]
-
-
-# ----------------------------------------------------------------------------------------------------
 
 
 # mover = PumpMove()
@@ -89,33 +92,6 @@ def scan_rats():
 
     return rat1, rat2
 
-rat1, rat2 = scan_rats()
-
-print("Session started\nSchedule:{}{}TO{}\nSession Length:{}sec\n",schedule, str(ratio), str(timeout), str(sessionLength))
-
-# start time
-sTime=time.time()
-lapsed=0
-
-# delete mover to prevent overheating
-# del(mover)
-
-subprocess.call("python3 operant_test.py " + \
-                "-schedule " + schedule + \
-                " -ratio " + str(ratio)  + \
-                " -sessionLength " + str(sessionLength) + \
-                " -rat1ID " + str(rat1) + \
-                " -rat2ID " + str(rat2) + \
-                " -timeout " + str(timeout) + \
-                " -rfidFile " + RFIDFILE + \
-                " &",
-                shell=True
-                )
-# subprocess.call("python3 operant_test.py -schedule {} -ratio {} -sessionLength {} -rat1ID {} -rat2ID {} -timeout {} &".format(schedule, str(ratio), str(sessionLength), rat1, rat2, str(timeout), shell=True))
-
-poke_counts = {rat1:{"act": 0, "inact": 0}, rat2:{"act":0, "inact":0}}
-
-
 def record_data(fname, mode ,record):
     with open(fname, mode) as f:
         f.write(record)
@@ -126,30 +102,59 @@ def write_header():
     with open(RFIDFILE, "w+") as f:
         f.write(file_format.format("rfid", "time", "act_inact", "lapsed", "poke_count"))
 
-write_header()
 
-while lapsed < sessionLength:
-    lapsed=time.time()-sTime
-    try:
-        rfid=input("rfid waiting\n")
-    except EOFError:
-        break
-    if (len(rfid)==10):
-        temp_rfid = rfid[-8:]
-        poke_counts[temp_rfid]["inact"] = poke_counts[temp_rfid]["inact"] + 1
-        record = file_format.format(temp_rfid, str(time.time()), "inactive", str(lapsed), str(poke_counts[temp_rfid]["inact"]))
-        print(record)
-        record_data(fname=ROOT+"/_inactive",mode="w+",record=record)
-        record_data(fname=RFIDFILE, mode="a+", record=record)
-            
+if TEST_SESSION:
+    pump_test(motor_step)
+else:
+    rat1, rat2 = scan_rats()
 
-    if (len(rfid)==8):
+    print("Session started\nSchedule:{}{}TO{}\nSession Length:{}sec\n",schedule, str(ratio), str(timeout), str(sessionLength))
+
+    # start time
+    sTime=time.time()
+    lapsed=0
+
+    # delete mover to prevent overheating
+    # del(mover)
+
+    subprocess.call("python3 operant_test.py " + \
+                    "-schedule " + schedule + \
+                    " -ratio " + str(ratio)  + \
+                    " -sessionLength " + str(sessionLength) + \
+                    " -rat1ID " + str(rat1) + \
+                    " -rat2ID " + str(rat2) + \
+                    " -timeout " + str(timeout) + \
+                    " -rfidFile " + RFIDFILE + \
+                    " &",
+                    shell=True
+                    )
+    # subprocess.call("python3 operant_test.py -schedule {} -ratio {} -sessionLength {} -rat1ID {} -rat2ID {} -timeout {} &".format(schedule, str(ratio), str(sessionLength), rat1, rat2, str(timeout), shell=True))
+
+    poke_counts = {rat1:{"act": 0, "inact": 0}, rat2:{"act":0, "inact":0}}
+
+    write_header()
+
+    while lapsed < sessionLength:
+        lapsed=time.time()-sTime
         try:
-            poke_counts[rfid]["act"] = poke_counts[rfid]["act"] + 1
-        except KeyError as e:
-            print("error occured: {}".format(e))
+            rfid=input("rfid waiting\n")
+        except EOFError:
+            break
+        if (len(rfid)==10):
+            temp_rfid = rfid[-8:]
+            poke_counts[temp_rfid]["inact"] = poke_counts[temp_rfid]["inact"] + 1
+            record = file_format.format(temp_rfid, str(time.time()), "inactive", str(lapsed), str(poke_counts[temp_rfid]["inact"]))
+            print(record)
+            record_data(fname=ROOT+"/_inactive",mode="w+",record=record)
+            record_data(fname=RFIDFILE, mode="a+", record=record)
+                
+        if (len(rfid)==8):
+            try:
+                poke_counts[rfid]["act"] = poke_counts[rfid]["act"] + 1
+            except KeyError as e:
+                print("error occured: {}".format(e))
 
-        record = file_format.format(rfid, str(time.time()), "active", str(lapsed), str(poke_counts[rfid]["act"]))
-        print(record)
-        record_data(fname=ROOT+"/_active",mode="w+",record=record)
-        record_data(fname=RFIDFILE,mode="a+", record=record)
+            record = file_format.format(rfid, str(time.time()), "active", str(lapsed), str(poke_counts[rfid]["act"]))
+            print(record)
+            record_data(fname=ROOT+"/_active",mode="w+",record=record)
+            record_data(fname=RFIDFILE,mode="a+", record=record)
