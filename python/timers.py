@@ -3,10 +3,14 @@
 from threading import Timer
 import time
 
-def resetPumpTimeout(rat):
-#    global pumptimedout
-    print (rat + " timeout reset")
-    pumptimedout[rat] = False
+# def resetPumpTimeout(rat):
+# #    global pumptimedout
+#     print (rat + " timeout reset******************************")
+#     # rat.timeout = False
+#     # rat.pumptimedup = False
+#     # timeout = True
+#     rat[0].pumptimedup = False
+#     # pumptimedout[rat] = False
 
 rat1ID="rat...1"
 rat2ID="rat...2"

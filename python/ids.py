@@ -4,49 +4,36 @@
 import os
 import time
 
-ROOT='/home/pi'
+from config import ROOT
+import json
+
+import sys
+
+
 DEVID_FILE = ROOT+'/deviceid'
 RATID_FILE = ROOT+'/ratids'
 SESSIONID_FILE = ROOT+'/sessionid'
-DATA_DIR = ROOT+'/SocialDrinking'
-DATA_PREFIX = "/Soc_"
 
-MOTOR_STEP_FILE = ROOT + '/step'
-
-with open (ROOT+"/_active", "w") as act:
-    act.write("ratUnknown\t"+str(time.time()))
-
-with open (ROOT+"/_inactive", "w") as inact:
-    inact.write("00ratUnknown\t"+str(time.time()))
-
-if not os.path.exists(DEVID_FILE):
-    print ("please edit " + DEVID_FILE + " to assign device ID")
-    with open (DEVID_FILE, 'w') as devID:
-        devID.write("BOX_X")
-if not os.path.exists(SESSIONID_FILE):
-    print ("please edit " + SESSIONID_FILE + " to assign initial session ID")
-    with open (SESSIONID_FILE, 'w') as sessionID:
-        sessionID.write("1")
-
-if not os.path.exists(DATA_DIR):
-    os.system("mkdir " + DATA_DIR)
+JSON_CONFIG_FILE = ROOT + '/peerpub_config.json'
 
 class IDS:
     def __init__(self):
-        with open (DEVID_FILE) as devID:
-            self.devID = str((devID.read()).strip())
-        with open (SESSIONID_FILE, "r") as sessID:
-            self.sesID=int(sessID.read().strip())
-            #newSesID=self.sesID+1
-            #sessID.seek(0)
-            #sessID.write(str(newSesID))
-            #sessID.close()
-    def sessionIncrement(self):
-        with open (SESSIONID_FILE, "r+") as sessID:
-            self.sesID=int(sessID.read().strip())
-            newSesID=self.sesID+1
-            self.sesID = newSesID
-            sessID.seek(0)
-            sessID.write(str(newSesID))
+        try:
+            with open(JSON_CONFIG_FILE ,'r') as f:
+                json_data = json.load(f)
+        except FileExistsError:
+            sys.exit("peerpub_config.json file not found in /home/pi")
             
+        self.devID = json_data['deviceid']
+        self.sesID = json_data['sessionid']
+        self.step = json_data['step']
+    def sessionIncrement(self):
+        f = open(JSON_CONFIG_FILE, 'w')
+        
+        json.dump({
+            "deviceid": self.devID,
+            "step": self.step,
+            "sessionid": self.sesID + 1
+        }, f)
 
+        f.close()

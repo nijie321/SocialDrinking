@@ -13,11 +13,8 @@ import time
 # gpio.setwarnings(False)
 # gpio.setmode(gpio.BCM)
 
-def pump_test():
-    step = 0
-    with open("/home/pi/step", "r") as f:
-        step = int(f.read().strip())
-        
+def pump_test(step_size):
+
     # command = input("Please scan the ") 
     act_count = 0
     i2c = busio.I2C(board.SCL, board.SDA)
@@ -49,7 +46,7 @@ def pump_test():
             print("act_count = ", act_count)
             if act_count % 5 == 0:
                 for i in range(5):
-                    mover.move("forward", step)
-                    print("step = ", step)
+                    mover.move("forward", step_size)
+                    print("step = ", step_size)
                 act_count = 0
             act_count += 1

@@ -38,4 +38,3 @@ if __name__ == "__main__":
         turn_light()
     else:
         turn_light(on=False)
-
