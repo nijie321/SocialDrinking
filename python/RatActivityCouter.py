@@ -52,14 +52,14 @@ class RatActivityCounter():
             )
 
     @staticmethod
-    def show_data(ids,sessionLength, schedule, lapsed,
+    def show_data(devID, sesID,sessionLength, schedule, lapsed,
                   rat1,rat2,rat_unknown, phase="progress"):
         if schedule == "pr":
             minsLeft = int((sessionLength - (time.time() - rat1.last_act_licks["time"])) / 60)
         else:
             minsLeft = int((sessionLength-lapsed)/60)
         if phase == "final":
-            print("{} Session_{}".format(ids.devID, ids.sesID))
+            print("{} Session_{}".format(devID, sesID))
 
         print ("\x1b[0;31;40m" + \
                 "[" + str(minsLeft) + " min Left]" + \

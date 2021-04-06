@@ -36,13 +36,8 @@ TEST_SESSION = False
 # file to store RFID scann times
 RFIDFILE = DATA_DIR + DATA_PREFIX + date + "_" + str(ids.devID)+ "_S"+str(ids.sesID)+ "_RFID.csv"
 
-if args.test:
-    # RatID = "ef"
-    RatID = "002cd652"
-else:
-    RatID = input("please scan a command RFID\n")[-8:]
+RatID = input("please scan a command RFID\n")[-8:]
 
-# rat_id = input("please scan a  RFID\n")[-8:]
 
 sessioninfo = get_sessioninfo(RatID)
 
@@ -72,11 +67,16 @@ sessioninfo = sessioninfo[0]
 # forwardbtn.when_pressed = forward
 # backwardbtn.when_pressed = backward
 
-
-schedule = sessioninfo[0]
-timeout = sessioninfo[1]
-ratio = sessioninfo[2]
-sessionLength = int(sessioninfo[4])
+if args.test:
+    schedule = "fr"
+    timeout = 10
+    ratio = 10
+    sessionLength = 60
+else:
+    schedule = sessioninfo[0]
+    timeout = sessioninfo[1]
+    ratio = sessioninfo[2]
+    sessionLength = int(sessioninfo[4])
 
 
 print("Run {} {} for {} hour \n".format(schedule, str(ratio), str(int(sessionLength/3600))))
@@ -125,6 +125,8 @@ else:
                     " -rat2ID " + str(rat2) + \
                     " -timeout " + str(timeout) + \
                     " -rfidFile " + RFIDFILE + \
+                    " -devID " + ids.devID + \
+                    " -sesID " + str(ids.sesID) + \
                     " &",
                     shell=True
                     )
