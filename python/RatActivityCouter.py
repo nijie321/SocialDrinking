@@ -13,26 +13,14 @@ class RatActivityCounter():
         self.last_inact_licks = {"time":float(time.time()), "scantime":0}
         self.pumptimedout = False
 
-
     # @staticmethod 
     def update_last_licks(self, lick_time, scan_time, act):
         if act:
-            # print(lick_time)
-            # print(type(lick_time))
             self.last_act_licks["time"] = lick_time
             self.last_act_licks["scantime"] = scan_time
-            # self.active_licks["time"] = lick_time
-            # self.active_licks["scantime"] = scan_time
         else:
             self.last_inact_licks["time"] = lick_time
             self.last_inact_licks["scantime"] = scan_time
-
-            # self.inactive_licks["time"] = lick_time
-            # self.inactive_licks["scantime"] = scan_time
-
-        # self.last_inact_licks
-        # lick_dict["time"] = lick_time
-        # lick_dict["scantime"] = scan_time
     
     @staticmethod
     def colored_print(ratID, act_count, inact_count, reward_count, timeout):
@@ -65,34 +53,32 @@ class RatActivityCounter():
                 "[" + str(minsLeft) + " min Left]" + \
                 "\x1b[0m")
 
-        RatActivityCounter.colored_print(rat1.ratid, rat1.active_licks,
-                                         rat1.inactive_licks, rat1.rewards,
-                                         rat1.pumptimedout)
-        RatActivityCounter.colored_print(rat2.ratid, rat2.active_licks,
-                                         rat2.inactive_licks, rat2.rewards,
-                                         rat2.pumptimedout)
-        RatActivityCounter.colored_print(rat_unknown.ratid, rat_unknown.active_licks,
-                                         rat_unknown.inactive_licks, rat_unknown.rewards,
-                                         rat_unknown.pumptimedout)
-
+        for rat in [rat1,rat2,rat_unknown]:
+            RatActivityCounter.colored_print(rat.ratid, rat.active_licks,
+                                             rat.inactive_licks, rat.rewards,
+                                             rat.pumptimedout)
+        # RatActivityCounter.colored_print(rat1.ratid, rat1.active_licks,
+        #                                  rat1.inactive_licks, rat1.rewards,
+        #                                  rat1.pumptimedout)
+        # RatActivityCounter.colored_print(rat2.ratid, rat2.active_licks,
+        #                                  rat2.inactive_licks, rat2.rewards,
+        #                                  rat2.pumptimedout)
+        # RatActivityCounter.colored_print(rat_unknown.ratid, rat_unknown.active_licks,
+        #                                  rat_unknown.inactive_licks, rat_unknown.rewards,
+        #                                  rat_unknown.pumptimedout)
         return time.time() 
-
 
     def incr_rewards(self):
         self.rewards += 1
-#self.rewards + 1
 
     def incr_active_licks(self):
         self.active_licks += 1
-#self.active_licks + 1
 
     def incr_inactive_licks(self):
         self.inactive_licks +=  1
-#self.inactive_licks + 1
 
     def incr_touch_counter(self):
         self. touch_counter += 1 
-#= self.touch_counter + 1
 
     def reset_touch_counter(self):
         self.touch_counter = 0

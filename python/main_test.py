@@ -48,7 +48,6 @@ while(len(sessioninfo) == 0):
     
 sessioninfo = sessioninfo[0]
 
-
 # mover = PumpMove()
 # forwardbtn = Button("GPIO5")
 # backwardbtn = Button("GPIO27")
@@ -93,14 +92,20 @@ def scan_rats():
     return rat1, rat2
 
 def record_data(fname, mode ,record):
-    with open(fname, mode) as f:
-        f.write(record)
+    try:
+        with open(fname, mode) as f:
+            f.write(record)
+    except OSError:
+        print("unable to open {}".format(fname))
 
 
 file_format = "{}\t{}\t{}\t{}\t{}\n"
 def write_header():
-    with open(RFIDFILE, "w+") as f:
-        f.write(file_format.format("rfid", "time", "act_inact", "lapsed", "poke_count"))
+    try:
+        with open(RFIDFILE, "w+") as f:
+            f.write(file_format.format("rfid", "time", "act_inact", "lapsed", "poke_count"))
+    except OSError:
+        print("unable to open {}".format(RFIDFILE))
 
 
 if TEST_SESSION:

@@ -111,7 +111,6 @@ rats = {
     rat2ID: RatActivityCounter(rat2ID,ratio, "rat2"),
     rat0ID: RatActivityCounter(rat0ID, 0),
 }
-
 ##############################################################
 
 # FORWARD_LIMIT = DigitalInputDevice(18)
@@ -141,9 +140,11 @@ def get_ratid_scantime(fname, this_lick, act):
             (rat, scantime, dummy1, dummy2, dummy3) = f.read().strip().split("\t")
             scantime = float(scantime)
             # print(rat, scantime, dummy1, dummy1)
-    except:
+            
+    except (OSError, ValueError) as e:
         rat = "ratUnknown"
         scantime = 0
+
     try:
         if rat is None:
             rat = "ratUnknown"
