@@ -21,8 +21,19 @@ class IDS:
         try:
             with open(JSON_CONFIG_FILE ,'r') as f:
                 json_data = json.load(f)
-        except FileExistsError:
+        except FileNotFoundError:
             sys.exit("peerpub_config.json file not found in /home/pi")
+        # except FileExistsError:
+            # json_data = {
+            #         "deviceid": "Box_n",
+            #         "step":300,
+            #         "sessionid": 1
+            #         }
+            # with open(JSON_CONFIG_FILE, 'w') as outfile:
+            #     json.dump(json_data, outfile)
+
+            # with open(JSON_CONFIG_FILE, 'a') as f:
+            #     f.write(json.dumps(json_data))
             
         self.devID = json_data['deviceid']
         self.sesID = json_data['sessionid']

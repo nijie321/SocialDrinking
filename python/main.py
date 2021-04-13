@@ -9,8 +9,32 @@ from gpiozero import Button
 from pump_move import PumpMove
 from gpiozero import DigitalInputDevice
 
+import traceback
+import logging
+
 
 from PumpTest import pump_test
+
+# logger
+logger = logging.getLogger('main')
+logger.setLevel(logging.DEBUG)
+
+# handler (output all log to a file and if the log is error, also output to console)
+fh = logging.FileHandler('/home/pi/main.log')
+fh.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.ERROR)
+
+# formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+
+# add handlers
+logger.addHandler(fh)
+logger.addHandler(ch)
+
 
 
 # get date and time 
@@ -20,7 +44,11 @@ date=time.strftime("%Y-%m-%d", time.localtime())
 ids = IDS()
 ids.sessionIncrement()
 # file to store RFID scann times
-RFIDFILE=DATA_DIR + DATA_PREFIX + date + "_" + str(ids.devID)+ "_S"+str(ids.sesID)+ "_RFID.csv"
+try:
+    RFIDFILE=DATA_DIR + DATA_PREFIX + date + "_" + str(ids.devID)+ "_S"+str(ids.sesID)+ "_RFID.csv"
+except:
+    logger.exception("don't know what kind of exception")
+    # logger.exception("error %s", e)
 
 RatID=input("please scan a command RFID\n")[-8:]
 
@@ -197,38 +225,52 @@ else:
         try:
             rfid=input("rfid waiting\n")
         except EOFError:
-            break
-        if (len(rfid)==10):
-            temp_rfid = rfid[-8:]
-            poke_counts[temp_rfid]["inact"] = poke_counts[temp_rfid]["inact"] + 1
-            record=temp_rfid+"\t"+str(time.time())+ "\tinactive\t" + str(lapsed) +"\n"
-            with open(ROOT + "/_inactive", "w+") as inactive:
-                inactive.write(record)
-                inactive.close()
-            with open(RFIDFILE, "a+") as inactive:
-                print ("\n    inactive spout " + temp_rfid + "\t")
-                inactive.write(record)
-            fname = "{}/{}_inact_count.txt".format(DATA_DIR, temp_rfid)
-            with open(fname, "w+") as f:
-                f.write("{}:{}".format(temp_rfid, poke_counts[temp_rfid]["inact"]))
-                
+            # when the input encounter the end of line before reading any input
+            continue
+        try:
+            if (len(rfid)==10):
+                temp_rfid = rfid[-8:]
+                poke_counts[temp_rfid]["inact"] = poke_counts[temp_rfid]["inact"] + 1
+                record=temp_rfid+"\t"+str(time.time())+ "\tinactive\t" + str(lapsed) +"\n"
+                with open(ROOT + "/_inactive", "w+") as inactive:
+                    inactive.write(record)
+                    inactive.close()
+                with open(RFIDFILE, "a+") as inactive:
+                    print ("\n    inactive spout " + temp_rfid + "\t")
+                    inactive.write(record)
+                fname = "{}/{}_inact_count.txt".format(DATA_DIR, temp_rfid)
+                with open(fname, "w+") as f:
+                    f.write("{}:{}".format(temp_rfid, poke_counts[temp_rfid]["inact"]))
+                    
 
-        if (len(rfid)==8):
-            try:
-                poke_counts[rfid]["act"] = poke_counts[rfid]["act"] + 1
-            except KeyError as e:
-                with open(ROOT + "/error.log", "a+") as f:
-                    f.write("error - {}\n".format(e))
-                    f.write("poke_counts - {}\n".format(poke_counts))
-                    f.write("rfid - {}\n".format(rfid))
+            if (len(rfid)==8):
+                try:
+                    poke_counts[rfid]["act"] = poke_counts[rfid]["act"] + 1
+                except KeyError as e:
+                    with open(ROOT + "/error.log", "a+") as f:
+                        f.write("error - {}\n".format(e))
+                        f.write("poke_counts - {}\n".format(poke_counts))
+                        f.write("rfid - {}\n".format(rfid))
 
-            record=rfid+"\t"+str(time.time())+ "\tactive\t" + str(lapsed)+ "\n"
-            with open(ROOT+"/_active", "w+") as active:
-                active.write(record)
-                active.close()
-            with open(RFIDFILE, "a+") as active:
-                print ("\n      active spout " + rfid + "\t")
-                active.write(record)
-            fname = "{}/{}_act_count.txt".format(DATA_DIR, rfid)
-            with open(fname, "w+") as f:
-                f.write("{}:{}".format(rfid,poke_counts[rfid]["act"]))
+                record=rfid+"\t"+str(time.time())+ "\tactive\t" + str(lapsed)+ "\n"
+                with open(ROOT+"/_active", "w+") as active:
+                    active.write(record)
+                    active.close()
+                with open(RFIDFILE, "a+") as active:
+                    print ("\n      active spout " + rfid + "\t")
+                    active.write(record)
+                fname = "{}/{}_act_count.txt".format(DATA_DIR, rfid)
+                with open(fname, "w+") as f:
+                    f.write("{}:{}".format(rfid,poke_counts[rfid]["act"]))
+        except KeyError as ke:
+            pass
+            
+            
+        except OSError as oe:
+            pass
+
+            
+        except:
+            pass
+
+            
