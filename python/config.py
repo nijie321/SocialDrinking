@@ -5,9 +5,9 @@ BASE_DIR = "./SocialDrink"
 
 ROOT = "/home/pi"
 DATA_DIR = "{}/{}/".format(ROOT, "SocialDrinking")
-DATA_PREFIX = "Soc"
+DATA_PREFIX = "Soc_"
 
-CONFIG_FILE = "session_configuration.csv"
+CONFIG_FILE = "/home/pi/openbehavior/PeerPub/python/session_configuration.csv"
 
 def get_sessioninfo(sessionid):
     with open(CONFIG_FILE, "r") as f:

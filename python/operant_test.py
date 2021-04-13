@@ -84,7 +84,7 @@ date=time.strftime("%Y-%m-%d", time.localtime())
 
 # Initialize data logger 
 dlogger = LickLogger(devID, sesID)
-dlogger.createDataFile(schedule="{}{}TO{}".format(schedule,str(ratio),str(timeout)), ratIDs=rat1ID+"_"+rat2ID)
+dlogger.createDataFile(schedule="{}{}TO{}".format(schedule,str(ratio),str(timeout)) , ratIDs=rat1ID+"_"+rat2ID, sessLen=sessionLength)
 
 # Get start time
 sTime = time.time()
@@ -298,7 +298,7 @@ dlogger.logEvent("", time.time(), "SessionEnd", time.time()-sTime)
 date=time.strftime("%Y-%m-%d", time.localtime())
 formatted_schedule = schedule+str(ratio)+'TO'+str(timeout)+"_"+ rat1ID+"_"+rat2ID
 schedule_to = schedule+str(ratio)+'TO'+str(timeout)
-finallog_fname = "Soc_{}_{}_S{}_{}_summary.tab".format(date,devID,sesID,formatted_schedule)
+finallog_fname = "Soc_{}_{}_S{}_{}_{}_summary.tab".format(date,devID,sesID,formatted_schedule,sessionLength)
 
 rat1 = rats[rat1ID]
 rat2 = rats[rat2ID]

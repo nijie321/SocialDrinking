@@ -60,8 +60,6 @@ motor_step = ids.step
 TEST_SESSION = False
 
 
-# file to store RFID scann times
-RFIDFILE = DATA_DIR + DATA_PREFIX + date + "_" + str(ids.devID)+ "_S"+str(ids.sesID)+ "_RFID.csv"
 
 RatID = input("please scan a command RFID\n")[-8:]
 
@@ -80,23 +78,23 @@ if not TEST_SESSION:
         
     sessioninfo = sessioninfo[0]
 
-# mover = PumpMove()
-# forwardbtn = Button("GPIO5")
-# backwardbtn = Button("GPIO27")
+    mover = PumpMove()
+    forwardbtn = Button("GPIO5")
+    backwardbtn = Button("GPIO27")
 
-# BACKWARD_LIMIT_BTN = "GPIO23"
-# BACKWARD_LIMIT = DigitalInputDevice(BACKWARD_LIMIT_BTN)
+    BACKWARD_LIMIT_BTN = "GPIO23"
+    BACKWARD_LIMIT = DigitalInputDevice(BACKWARD_LIMIT_BTN)
 
-# def forward():
-#     while forwardbtn.value == 1:
-#         mover.move("forward")
+    def forward():
+        while forwardbtn.value == 1:
+            mover.move("forward")
 
-# def backward():
-#     while BACKWARD_LIMIT.value != 1:
-#         mover.move("backward")
+    def backward():
+        while BACKWARD_LIMIT.value != 1:
+            mover.move("backward")
 
-# forwardbtn.when_pressed = forward
-# backwardbtn.when_pressed = backward
+    forwardbtn.when_pressed = forward
+    backwardbtn.when_pressed = backward
 
     if args.test:
         schedule = "fr"
@@ -109,10 +107,10 @@ if not TEST_SESSION:
         ratio = sessioninfo[2]
         sessionLength = int(sessioninfo[4])
 
+    # file to store RFID scann times
+    RFIDFILE = DATA_DIR + DATA_PREFIX + date + "_" + str(ids.devID)+ "_S"+str(ids.sesID)+ "_" + str(sessionLength) + "_RFID.csv"
 
     print("Run {} {} for {} hour \n".format(schedule, str(ratio), str(int(sessionLength/3600))))
-
-
 
 def scan_rats():
     rat1 = input("please scan rat1\n")[-8:]
@@ -158,7 +156,7 @@ else:
     lapsed=0
 
     # delete mover to prevent overheating
-    # del(mover)
+    del(mover)
 
     logger.info("called operant")
     subprocess.call("python3 operant_test.py " + \
