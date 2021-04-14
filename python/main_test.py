@@ -20,7 +20,7 @@ import logging
 # logging config
 
 # logger
-logger = logging.getLogger('')
+logger = logging.getLogger('main_log')
 logger.setLevel(logging.DEBUG)
 
 # handler (output all log to a file and if the log is error, also output to console)
