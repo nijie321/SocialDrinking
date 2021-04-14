@@ -8,3 +8,4 @@ id1,id2,schedule,timeout,ratio,nextratio,sessionLength(sec)
 0087739a,002c732f,vr,10,10,10,14400
 002d54ff,002b392d,vr,1,5,5,14400
 0084668e,002cdfc3,vr,10,10,10,57600
+002ce87b,008466a3,fr,10,5,5,1800

@@ -30,7 +30,7 @@ class PumpMove:
         self.GPIO = GPIO
         self.GPIO.setmode(self.GPIO.BCM)
         self.GPIO.setup(self.DIR, self.GPIO.OUT, initial=self.GPIO.HIGH)
-        self.GPIO.setup(self.SLEEP, self.GPIO.OUT, initial=self.GPIO.LOW)
+        # self.GPIO.setup(self.SLEEP, self.GPIO.OUT, initial=self.GPIO.LOW)
         self.GPIO.setup(self.STEP, self.GPIO.OUT, initial=self.GPIO.HIGH)
         self.GPIO.output(self.DIR,self.CW)
         
@@ -46,8 +46,8 @@ class PumpMove:
                           }
         
         self.step_counts = steps
-        # self.delay = .0209 / 50
-        self.delay = 0.005
+        self.delay = .0209 / 50
+        # self.delay = 0.005
         self.rotate_dir = rotate_dir
 
         # self.pi.set_PWM_dutycycle(self.STEP, 128)
@@ -66,7 +66,7 @@ class PumpMove:
             # sleep(self.delay)
 
         try:
-            self.GPIO.output(self.SLEEP, self.GPIO.HIGH)
+            # self.GPIO.output(self.SLEEP, self.GPIO.HIGH)
             self.GPIO.output(self.MODE, self.RESOLUTION['Full'])
             self.GPIO.output(self.DIR, direction_dict[direction])
 
@@ -83,7 +83,7 @@ class PumpMove:
         # self.pi.write(self.SLEEP, 0)
 
     def __del__(self):
-        self.GPIO.output(self.SLEEP, self.GPIO.LOW)
+        # self.GPIO.output(self.SLEEP, self.GPIO.LOW)
         self.GPIO.cleanup(self.MODE)
         # self.pi.set_PWM_dutycycle(self.STEP, 0)
         # self.pi.write(self.SLEEP, 0)
