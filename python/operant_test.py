@@ -346,5 +346,5 @@ print(str(devID) +  "Session" + str(sesID) + " Done!\n")
 RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
                         rats[rat1ID],rats[rat2ID],rats[rat0ID], "final")
 
-subprocess.call('/home/pi/openbehavior/wifi-network/rsync.sh &', shell=True)
+subprocess.call('/home/pi/openbehavior/PeerPub/wifi-network/rsync.sh &', shell=True)
 print(devID+  "Session"+ str(sesID) + " Done!\n")
