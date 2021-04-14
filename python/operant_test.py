@@ -23,6 +23,28 @@ import RPi.GPIO as GPIO
 from RatActivityCouter import RatActivityCounter
 # import RatActivityCounter
 
+import logging
+
+# logger
+logger = logging.getLogger('operant_log')
+logger.setLevel(logging.DEBUG)
+
+# handler (output all log to a file and if the log is error, also output to console)
+fh = logging.FileHandler('/home/pi/operant.log')
+fh.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.ERROR)
+
+# formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+
+# add handlers
+logger.addHandler(fh)
+logger.addHandler(ch)
+
 
 parser=argparse.ArgumentParser()
 parser.add_argument('-schedule',  type=str, default="vr")
@@ -191,7 +213,11 @@ while lapsed < sessionLength:
         
         (ratid, scantime) = get_ratid_scantime("/home/pi/_active", thisActiveLick, act=True)
         
-        rat = rats[ratid] 
+        try:
+          rat = rats[ratid] 
+        except KeyError:
+          logger.exception("unable to retrive key %s", ratid)
+          
         print("pumptimeout = {}".format(rat.pumptimedout))
 
         # if (thisActiveLick - rat.last_act_licks["time"] > maxILI) and (thisActiveLick - scantime > maxISI):
@@ -227,7 +253,10 @@ while lapsed < sessionLength:
                 # don't delete this line
                 pumptimedout[ratid] = True
 
-                rats[ratid].pumptimedout = True
+                try:
+                  rat = rats[ratid] 
+                except KeyError:
+                  logger.exception("unable to retrive key %s", ratid)
 
                 pumpTimer = Timer(timeout, resetPumpTimeout, [ratid] )
                 # pumpTimer = Timer(timeout, resetPumpTimeout, ratid )
