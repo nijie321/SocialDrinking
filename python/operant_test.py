@@ -198,129 +198,132 @@ def houselight_check():
            
          
 while lapsed < sessionLength:
-    houselight_check()
+    try:
+        houselight_check()
 
-    time.sleep(0.05) # allow 20 licks per sec
-    ina0 = mpr121.touched_pins[0]
-    act1 = mpr121.touched_pins[1]
-    lapsed = time.time() - sTime
+        time.sleep(0.05) # allow 20 licks per sec
+        ina0 = mpr121.touched_pins[0]
+        act1 = mpr121.touched_pins[1]
+        lapsed = time.time() - sTime
 
-    if GPIO.input(FORWARD_LIMIT_BTN):
-        FORWARD_LIMIT_REACHED = True
+        if GPIO.input(FORWARD_LIMIT_BTN):
+            FORWARD_LIMIT_REACHED = True
 
-    if act1 == 1:
-        thisActiveLick=time.time()
-        
-        (ratid, scantime) = get_ratid_scantime("/home/pi/_active", thisActiveLick, act=True)
-        
-        try:
-          rat = rats[ratid] 
-        except KeyError:
-          logger.exception("unable to retrive key %s", ratid)
-          
-        print("pumptimeout = {}".format(rat.pumptimedout))
-
-        # if (thisActiveLick - rat.last_act_licks["time"] > maxILI) and (thisActiveLick - scantime > maxISI):
-        #     rat = rats["ratUnknown"]
+        if act1 == 1:
+            thisActiveLick=time.time()
             
-        # last_act_licks = rat.last_act_licks
+            (ratid, scantime) = get_ratid_scantime("/home/pi/_active", thisActiveLick, act=True)
+            
+            try:
+              rat = rats[ratid] 
+            except KeyError:
+              logger.exception("unable to retrive key %s", ratid)
+              
+            print("pumptimeout = {}".format(rat.pumptimedout))
 
-        if(thisActiveLick - rat.last_act_licks["time"] > 1):
-            rat.update_last_licks(thisActiveLick, scantime, act=True)
-        else:
-            rat.incr_active_licks()
-            if FORWARD_LIMIT_REACHED:
-                dlogger.logEvent(rat.ratid, time.time(), "syringe empty", time.time() - sTime) 
+            # if (thisActiveLick - rat.last_act_licks["time"] > maxILI) and (thisActiveLick - scantime > maxISI):
+            #     rat = rats["ratUnknown"]
+                
+            # last_act_licks = rat.last_act_licks
+
+            if(thisActiveLick - rat.last_act_licks["time"] > 1):
+                rat.update_last_licks(thisActiveLick, scantime, act=True)
             else:
-                dlogger.logEvent(rat.ratid, time.time() - rat.last_act_licks["scantime"], "ACTIVE", lapsed, rat.next_ratio) # add next ratio
-
-            rat.update_last_licks(thisActiveLick, scantime, act=True)
-            
-            RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
-                                        rats[rat1ID],rats[rat2ID],rats[rat0ID])
-
-            updateTime = time.time()
-
-        # if not rat.pumptimedout:
-        if not pumptimedout[ratid]:
-        
-            rat.incr_touch_counter()
-
-            if rat.touch_counter >= rat.next_ratio and rat != "ratUnknown":
-                rat.incr_rewards()
-                rat.reset_touch_counter()
-
-                # don't delete this line
-                pumptimedout[ratid] = True
-
-                try:
-                  rat = rats[ratid] 
-                except KeyError:
-                  logger.exception("unable to retrive key %s", ratid)
-
-                pumpTimer = Timer(timeout, resetPumpTimeout, [ratid] )
-                # pumpTimer = Timer(timeout, resetPumpTimeout, ratid )
-
-                print("timeout on " + rat.ratid)
-                pumpTimer.start()
-
-                if not FORWARD_LIMIT_REACHED:
-                    subprocess.call('sudo python ' + './blinkenlights.py -reward_happened True&', shell=True)
-
+                rat.incr_active_licks()
                 if FORWARD_LIMIT_REACHED:
-                    dlogger.logEvent(rat.ratid,time.time(), "syringe empty", time.time() - sTime)
+                    dlogger.logEvent(rat.ratid, time.time(), "syringe empty", time.time() - sTime) 
                 else:
-                    dlogger.logEvent(rat.ratid, time.time()- scantime, "REWARD", time.time() - sTime)
-                    mover = PumpMove()
-                    if(float(sessionLength) / 3600 == 16.0):
-                        mover.move("forward", 130)
-                    else:
-                        mover.move("forward", 150)
+                    dlogger.logEvent(rat.ratid, time.time() - rat.last_act_licks["scantime"], "ACTIVE", lapsed, rat.next_ratio) # add next ratio
 
-                    del(mover)
+                rat.update_last_licks(thisActiveLick, scantime, act=True)
+                
+                RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
+                                            rats[rat1ID],rats[rat2ID],rats[rat0ID])
+
+                updateTime = time.time()
+
+            # if not rat.pumptimedout:
+            if not pumptimedout[ratid]:
+            
+                rat.incr_touch_counter()
+
+                if rat.touch_counter >= rat.next_ratio and rat != "ratUnknown":
+                    rat.incr_rewards()
+                    rat.reset_touch_counter()
+
+                    # don't delete this line
+                    pumptimedout[ratid] = True
+
+                    try:
+                      rat = rats[ratid] 
+                    except KeyError:
+                      logger.exception("unable to retrive key %s", ratid)
+
+                    pumpTimer = Timer(timeout, resetPumpTimeout, [ratid] )
+                    # pumpTimer = Timer(timeout, resetPumpTimeout, ratid )
+
+                    print("timeout on " + rat.ratid)
+                    pumpTimer.start()
+
+                    if not FORWARD_LIMIT_REACHED:
+                        subprocess.call('sudo python ' + './blinkenlights.py -reward_happened True&', shell=True)
+
+                    if FORWARD_LIMIT_REACHED:
+                        dlogger.logEvent(rat.ratid,time.time(), "syringe empty", time.time() - sTime)
+                    else:
+                        dlogger.logEvent(rat.ratid, time.time()- scantime, "REWARD", time.time() - sTime)
+                        mover = PumpMove()
+                        if(float(sessionLength) / 3600 == 16.0):
+                            mover.move("forward", 130)
+                        else:
+                            mover.move("forward", 150)
+
+                        del(mover)
+
+                    RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
+                                            rats[rat1ID],rats[rat2ID],rats[rat0ID])
+
+                    updateTime = time.time()
+
+                    if schedule == "fr":
+                        rat.next_ratio = ratio
+                    elif schedule == "vr":
+                        rat.next_ratio = random.randint(1,ratio*2)
+                    elif schedule == "pr":
+                        breakpoint += 1.0
+                        rat.next_ratop = int(5*2.72**(breakpoint/5)-5)
+        elif ina0 == 1:
+            thisInactiveLick = time.time()
+
+            (ratid, scantime) = get_ratid_scantime("/home/pi/_inactive", thisInactiveLick, act=False)
+
+            rat = rats[ratid] 
+            # if (thisInactiveLick- rat.last_inact_licks["time"] > maxILI) and (thisInactiveLick - scantime > maxISI):
+            #     rat = rats["ratUnknown"]
+
+            # last_inact_licks = rat.last_inact_licks
+            if thisInactiveLick - rat.last_inact_licks["time"] > 1:
+                rat.update_last_licks(thisInactiveLick, scantime, act=False)
+            else:
+                rat.incr_inactive_licks()
+                dlogger.logEvent(rat.ratid,time.time() - rat.last_inact_licks["scantime"], "INACTIVE", lapsed)
+                rat.update_last_licks(thisInactiveLick, scantime, act=False)
 
                 RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
                                         rats[rat1ID],rats[rat2ID],rats[rat0ID])
 
                 updateTime = time.time()
 
-                if schedule == "fr":
-                    rat.next_ratio = ratio
-                elif schedule == "vr":
-                    rat.next_ratio = random.randint(1,ratio*2)
-                elif schedule == "pr":
-                    breakpoint += 1.0
-                    rat.next_ratop = int(5*2.72**(breakpoint/5)-5)
-    elif ina0 == 1:
-        thisInactiveLick = time.time()
-
-        (ratid, scantime) = get_ratid_scantime("/home/pi/_inactive", thisInactiveLick, act=False)
-
-        rat = rats[ratid] 
-        # if (thisInactiveLick- rat.last_inact_licks["time"] > maxILI) and (thisInactiveLick - scantime > maxISI):
-        #     rat = rats["ratUnknown"]
-
-        # last_inact_licks = rat.last_inact_licks
-        if thisInactiveLick - rat.last_inact_licks["time"] > 1:
-            rat.update_last_licks(thisInactiveLick, scantime, act=False)
-        else:
-            rat.incr_inactive_licks()
-            dlogger.logEvent(rat.ratid,time.time() - rat.last_inact_licks["scantime"], "INACTIVE", lapsed)
-            rat.update_last_licks(thisInactiveLick, scantime, act=False)
-
+        # keep this here so that the PR data file will record lapse from sesion start 
+        if schedule=="pr":
+            lapsed = time.time() - lastActiveLick
+        #show data if idle more than 1 min 
+        if time.time()-updateTime > 60*1:
             RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
                                     rats[rat1ID],rats[rat2ID],rats[rat0ID])
-
             updateTime = time.time()
-
-    # keep this here so that the PR data file will record lapse from sesion start 
-    if schedule=="pr":
-        lapsed = time.time() - lastActiveLick
-    #show data if idle more than 1 min 
-    if time.time()-updateTime > 60*1:
-        RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
-                                rats[rat1ID],rats[rat2ID],rats[rat0ID])
-        updateTime = time.time()
+    except:
+        logger.exception("while loop error")
 
 dlogger.logEvent("", time.time(), "SessionEnd", time.time()-sTime)
 
