@@ -17,6 +17,8 @@ from PumpTest import pump_test
 
 import logging
 
+
+
 # logging config
 
 # logger
@@ -58,14 +60,18 @@ ids.sessionIncrement()
 motor_step = ids.step
 
 TEST_SESSION = False
-
-
+UPDATE_REPO = False
 
 RatID = input("please scan a command RFID\n")[-8:]
 
 if RatID[-2:] == "6b" or RatID[-2:] == "ba":
     TEST_SESSION = True
 
+if RatID[-1:] == "0c" or RatID[-2:] == "fe":
+    UPDATE_REPO = True
+
+if UPDATE_REPO:
+    subprocess.call("bash /home/pi/openbehavior/PeerPub/utility_script/update_repo.sh &", shell=True)
 
 if not TEST_SESSION:
 
