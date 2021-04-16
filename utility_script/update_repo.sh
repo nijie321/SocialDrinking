@@ -1,7 +1,9 @@
 #!/bin/bash
 
-cd /home/pi/openbehavior/SocialDrinking/
+cd /home/pi/openbehavior/PeerPub/
 
 git pull --depth 1
 
-reboot
+sleep 5
+
+sudo reboot
