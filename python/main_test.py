@@ -182,7 +182,7 @@ else:
 
     poke_counts = {rat1:{"act": 0, "inact": 0}, rat2:{"act":0, "inact":0}}
 
-    write_header()
+    # write_header()
 
     logger.info("while loop started")
     while lapsed < sessionLength:

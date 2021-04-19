@@ -328,18 +328,20 @@ while lapsed < sessionLength:
 dlogger.logEvent("", time.time(), "SessionEnd", time.time()-sTime)
 
 date=time.strftime("%Y-%m-%d", time.localtime())
+d_time = time.strftime("%H:%M:%S", time.localtime())
+
 formatted_schedule = schedule+str(ratio)+'TO'+str(timeout)+"_"+ rat1ID+"_"+rat2ID
 schedule_to = schedule+str(ratio)+'TO'+str(timeout)
-finallog_fname = "Soc_{}_{}_S{}_{}_{}_summary.tab".format(date,devID,sesID,formatted_schedule,sessionLength)
+finallog_fname = "Soc_{}_{}_S{}_{}_{}_summary.tab".format(date,d_time,devID,sesID,formatted_schedule,sessionLength)
 
 rat1 = rats[rat1ID]
 rat2 = rats[rat2ID]
 rat0 = rats[rat0ID]
 
 data_dict = {
-            "ratID1":[rat1ID, date,devID,sesID,schedule_to,sessionLength,rat1.active_licks,rat1.inactive_licks,rat1.rewards],
-            "ratID2":[rat2ID, date,devID,sesID,schedule_to,sessionLength,rat2.active_licks,rat2.inactive_licks,rat2.rewards],
-            "ratID0":[rat0ID, date,devID,sesID,schedule_to,sessionLength,rat0.active_licks,rat0.inactive_licks,rat0.rewards]
+            "ratID1":[rat1ID, date,d_time,devID,sesID,schedule_to,sessionLength,rat1.active_licks,rat1.inactive_licks,rat1.rewards],
+            "ratID2":[rat2ID, date,d_time,devID,sesID,schedule_to,sessionLength,rat2.active_licks,rat2.inactive_licks,rat2.rewards],
+            "ratID0":[rat0ID, date,d_time,devID,sesID,schedule_to,sessionLength,rat0.active_licks,rat0.inactive_licks,rat0.rewards]
             }
 
 LickLogger.finalLog(finallog_fname, data_dict, rfid_file)
