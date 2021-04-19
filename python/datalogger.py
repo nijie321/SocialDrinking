@@ -21,9 +21,8 @@ class LickLogger:
         self.datafile = DATA_DIR + DATA_PREFIX + date + "_" + str(self.devID) + '_S' + str(self.sessID) +  "_" + schedule + "_" + str(ratIDs) + '_' + str(sessLen) +  '.csv'
         print ("\nData file location:\n", self.datafile)
         # open data file
-        with open(self.datafile,"a") as f:
-            f.write("RatID\tRfidSec\tdate\tstart_time\tboxid\tEventType\t"+schedule+"\tlapsedSec\n")
-            f.close()
+        # with open(self.datafile,"a") as f:
+        #     f.write("RatID\tRfidSec\tdate\tstart_time\tboxid\tEventType\t"+schedule+"\tlapsedSec\n")
 
     def logEvent(self, rat, eventSec, eventType, timeLapsed, ratio=0):
         # Create output string
@@ -49,12 +48,13 @@ class LickLogger:
                     poke_counts[rid]["inact"] = int(poke_count.strip())
 
         with open(DATA_DIR+ "/" + fname, "a+") as f:
-            header = (("{}\t"*11).format("ratID", "date", "devID", "sessionID", "schedule", "sessionLen", "activeCount", "inactiveCount", "rewardCount","activePoke", "inactivePoke") ) + "\n"
+            # header = (("{}\t"*11).format("ratID", "date", "devID", "sessionID", "schedule", "sessionLen", "activeCount", "inactiveCount", "rewardCount","activePoke", "inactivePoke") ) + "\n"
             print(DATA_DIR + "/" + fname)
-            ID1_str = (("{}\t"*11).format(*data_dict["ratID1"], poke_counts[ratids[0]]["act"], poke_counts[ratids[0]]["inact"])) + "\n"
-            ID2_str = (("{}\t"*11).format(*data_dict["ratID2"], poke_counts[ratids[1]]["act"], poke_counts[ratids[1]]["inact"])) + "\n"
-            ID0_str = (("{}\t"*11).format(*data_dict["ratID0"], 0, 0)) + "\n"
-            f.write(header + ID1_str + ID2_str + ID0_str)
+            ID1_str = (("{}\t"*12).format(*data_dict["ratID1"], poke_counts[ratids[0]]["act"], poke_counts[ratids[0]]["inact"])) + "\n"
+            ID2_str = (("{}\t"*12).format(*data_dict["ratID2"], poke_counts[ratids[1]]["act"], poke_counts[ratids[1]]["inact"])) + "\n"
+            ID0_str = (("{}\t"*12).format(*data_dict["ratID0"], 0, 0)) + "\n"
+            f.write(ID1_str + ID2_str + ID0_str)
+            # f.write(header + ID1_str + ID2_str + ID0_str)
         
                 
 
