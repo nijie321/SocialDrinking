@@ -59,6 +59,8 @@ ids.sessionIncrement()
 
 motor_step = ids.step
 
+sTime=time.time()
+
 TEST_SESSION = False
 UPDATE_REPO = False
 
@@ -138,15 +140,26 @@ def record_data(fname, mode ,record):
     #     print("unable to open {}".format(fname))
 
 
+# overwrite the id files before the program start
+# this will remove the rfid from previous sessions
+def overwrite_id_file():
+    with open("/home/pi/_inactive", "w") as f:
+        record = file_format.format(rat1, str(time.time()), "inactive", str(time.time()-sTime), str(poke_counts[rat1]["inact"]))
+        f.write(record)
+
+    with open("/home/pi/active", "w") as f:
+        record = file_format.format(rat2, str(time.time()), "active", str(time.time()-sTime), str(poke_counts[rat2]["act"]))
+        f.write(record)
+
+overwrite_id_file()
+
 file_format = "{}\t{}\t{}\t{}\t{}\n"
 def write_header():
     try:
         with open(RFIDFILE, "w+") as f:
             f.write(file_format.format("rfid", "time", "act_inact", "lapsed", "poke_count"))
     except:
-        logger.exception("unable to open filename %s", fname)
-    # except OSError:
-    #     print("unable to open {}".format(RFIDFILE))
+        logger.exception("unable to open the file")
 
 
 if TEST_SESSION:
@@ -182,9 +195,8 @@ else:
 
     poke_counts = {rat1:{"act": 0, "inact": 0}, rat2:{"act":0, "inact":0}}
 
-    # write_header()
-
     logger.info("while loop started")
+
     while lapsed < sessionLength:
         lapsed=time.time()-sTime
         try:
