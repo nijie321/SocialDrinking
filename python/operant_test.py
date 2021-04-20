@@ -199,7 +199,7 @@ def houselight_check():
          
 while lapsed < sessionLength:
     try:
-        houselight_check()
+        # houselight_check()
 
         time.sleep(0.05) # allow 20 licks per sec
         ina0 = mpr121.touched_pins[0]
