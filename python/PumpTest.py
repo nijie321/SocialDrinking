@@ -9,12 +9,11 @@ import adafruit_mpr121
 
 import time
 
-# import RPi.GPIO as gpio
-# gpio.setwarnings(False)
-# gpio.setmode(gpio.BCM)
+file_dir = "/home/pi/SocialDrinkings/{}"
 
-def pump_test(step_size):
 
+def pump_test(step_size, fname):
+    old_step = step_size
     # command = input("Please scan the ") 
     act_count = 0
     i2c = busio.I2C(board.SCL, board.SDA)
@@ -38,15 +37,40 @@ def pump_test(step_size):
     forwardbtn.when_pressed = forward
     backwardbtn.when_pressed = backward
 
-    
+    print("current step size = " + str(step_size)) 
+    print("please prepare to measure the solution.")
+
     while True:
-        time.sleep(0.050) # allow 20 licks per sec
+        time.sleep(0.050)
         act = mpr121.touched_pins[1]
+
         if act:
-            print("act_count = ", act_count)
             if act_count % 5 == 0:
                 for i in range(5):
                     mover.move("forward", step_size)
-                    print("step = ", step_size)
-                act_count = 0
+
             act_count += 1
+
+            if act_count == 15:
+                response = input("please enter the amount measured (numeric value) or scan the command id again to exit: ").strip()
+                if response[-2:] == '16' or response[-2:] == '89':
+                    break
+                else:
+                    try:
+                        response = int(response)
+                    except ValueError:
+                        response = int(input("please re-enter the amount measured: ").strip())
+
+                avg_measured_value = response / 3
+                
+                if (avg_measured_value < (300-10) and avg_measured_value > (300+10)):
+                    # update step size
+                    step_size = ( (step_size*5 / 300) * avg_measured_value )  / 5
+                
+                act_count = 0
+
+    date = time.strftime("%Y-%m-%d", time.localtime())
+    d_time = time.strftime("%Y-%m-%d", time.localtime())
+    record = "{}\t"*4
+    with open(file_dir.format(fname), "w") as f:
+        f.write(record.format(date, d_time, old_step, step_size))

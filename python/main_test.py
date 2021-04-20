@@ -43,7 +43,6 @@ logger.addHandler(ch)
 # --------------------------------------------------------------------
 
 
-
 parser=argparse.ArgumentParser()
 parser.add_argument('-test',  type=bool, default=False)
 
@@ -164,7 +163,7 @@ def write_header():
 
 if TEST_SESSION:
     logger.info("pump test started")
-    pump_test(motor_step)
+    pump_test(motor_step, "{}_steps".format(ids.devID))
 else:
     rat1, rat2 = scan_rats()
 

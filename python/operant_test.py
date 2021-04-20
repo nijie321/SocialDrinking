@@ -1,4 +1,3 @@
-  
 #!/usr/bin/env python3
 
 import pigpio
@@ -164,6 +163,7 @@ def get_ratid_scantime(fname, this_lick, act):
             # print(rat, scantime, dummy1, dummy1)
             
     except (OSError, ValueError) as e:
+        logging.exception("ratid error: %s", e)
         rat = "ratUnknown"
         scantime = 0
 
