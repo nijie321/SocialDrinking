@@ -139,6 +139,7 @@ def record_data(fname, mode ,record):
     #     print("unable to open {}".format(fname))
 
 
+print(datetime)
 # overwrite the id files before the program start
 # this will remove the rfid from previous sessions
 def overwrite_id_file():
