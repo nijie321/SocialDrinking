@@ -70,7 +70,7 @@ class PumpMove:
             self.GPIO.output(self.MODE, self.RESOLUTION['Full'])
             self.GPIO.output(self.DIR, direction_dict[direction])
 
-            for step in range(steps):
+            for _ in range(steps):
                 self.GPIO.output(self.STEP, self.GPIO.HIGH)
                 sleep(self.delay)
                 self.GPIO.output(self.STEP, self.GPIO.LOW)

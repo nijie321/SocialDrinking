@@ -11,7 +11,11 @@
     
     Operant Program: operant.py (operant_test.py) is the program which main invoke at the end of it's executation.
     This program handles saving each data point to corresponding data files.
-    
+
+   Pump Driver Program: pump_move.py is the program that is used, as a higher level abstraction, to drive the stepper motor using underlying gpiozero/RPi.GPIO library. This program mainly consist of the PumpMove class which contains a move() class for "rotating" the motor (forward and backward). The __del__ method need to be call at the end of each use to 'shutoff' the motor. This prevent the motor driver from overheating (there are more efficient ways to do this).
+   
+   Activity Counter Program: Rat's activity (inactive lick, active lick, and etc) are being represent as an instance of RatActivityCounter.
+   
 
 ## Configuration
    - Files
@@ -28,3 +32,5 @@
 ## Utility Scripts
 
     **check_empty_program.sh**: a script that check the size of every python file in the python/ directory. If one or more files are empty the script then reclone the entire repository.
+
+    **check_network.sh**: a script that check the network connection right after the device boots up and ask user for action when the device was not able to connect to network.
