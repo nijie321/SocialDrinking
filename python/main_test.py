@@ -187,6 +187,7 @@ else:
                     " -rfidFile " + RFIDFILE + \
                     " -devID " + ids.devID + \
                     " -sesID " + str(ids.sesID) + \
+                    " -step " + str(motor_step) + \
                     " &",
                     shell=True
                     )
