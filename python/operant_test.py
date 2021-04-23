@@ -242,56 +242,56 @@ while lapsed < sessionLength:
 
                 updateTime = time.time()
 
-            # if not rat.pumptimedout:
-            if not pumptimedout[ratid]:
-            
-                rat.incr_touch_counter()
+                # if not rat.pumptimedout:
+                if not pumptimedout[ratid]:
+                
+                    rat.incr_touch_counter()
 
-                if rat.touch_counter >= rat.next_ratio and rat != "ratUnknown":
-                    rat.incr_rewards()
-                    rat.reset_touch_counter()
+                    if rat.touch_counter >= rat.next_ratio and rat.ratid != "ratUnknown":
+                        rat.incr_rewards()
+                        rat.reset_touch_counter()
 
-                    # don't delete this line
-                    pumptimedout[ratid] = True
+                        # don't delete this line
+                        pumptimedout[ratid] = True
 
-                    try:
-                      rat = rats[ratid] 
-                    except KeyError:
-                      logger.exception("unable to retrive key %s", ratid)
+                        try:
+                        rat = rats[ratid] 
+                        except KeyError:
+                        logger.exception("unable to retrive key %s", ratid)
 
-                    pumpTimer = Timer(timeout, resetPumpTimeout, [ratid] )
-                    # pumpTimer = Timer(timeout, resetPumpTimeout, ratid )
+                        pumpTimer = Timer(timeout, resetPumpTimeout, [ratid] )
+                        # pumpTimer = Timer(timeout, resetPumpTimeout, ratid )
 
-                    print("timeout on " + rat.ratid)
-                    pumpTimer.start()
+                        print("timeout on " + rat.ratid)
+                        pumpTimer.start()
 
-                    if not FORWARD_LIMIT_REACHED:
-                        subprocess.call('sudo python ' + './blinkenlights.py -reward_happened True&', shell=True)
+                        if not FORWARD_LIMIT_REACHED:
+                            subprocess.call('sudo python ' + './blinkenlights.py -reward_happened True&', shell=True)
 
-                    if FORWARD_LIMIT_REACHED:
-                        dlogger.logEvent(rat.ratid,time.time(), "syringe empty", time.time() - sTime)
-                    else:
-                        dlogger.logEvent(rat.ratid, time.time()- scantime, "REWARD", time.time() - sTime)
-                        mover = PumpMove()
-                        if(float(sessionLength) / 3600 == 16.0):
-                            mover.move("forward", 130)
+                        if FORWARD_LIMIT_REACHED:
+                            dlogger.logEvent(rat.ratid,time.time(), "syringe empty", time.time() - sTime)
                         else:
-                            mover.move("forward", 150)
+                            dlogger.logEvent(rat.ratid, time.time()- scantime, "REWARD", time.time() - sTime)
+                            mover = PumpMove()
+                            if(float(sessionLength) / 3600 == 16.0):
+                                mover.move("forward", 130)
+                            else:
+                                mover.move("forward", 150)
 
-                        del(mover)
+                            del(mover)
 
-                    RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
-                                            rats[rat1ID],rats[rat2ID],rats[rat0ID])
+                        RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
+                                                rats[rat1ID],rats[rat2ID],rats[rat0ID])
 
-                    updateTime = time.time()
+                        updateTime = time.time()
 
-                    if schedule == "fr":
-                        rat.next_ratio = ratio
-                    elif schedule == "vr":
-                        rat.next_ratio = random.randint(1,ratio*2)
-                    elif schedule == "pr":
-                        breakpoint += 1.0
-                        rat.next_ratop = int(5*2.72**(breakpoint/5)-5)
+                        if schedule == "fr":
+                            rat.next_ratio = ratio
+                        elif schedule == "vr":
+                            rat.next_ratio = random.randint(1,ratio*2)
+                        elif schedule == "pr":
+                            breakpoint += 1.0
+                            rat.next_ratop = int(5*2.72**(breakpoint/5)-5)
         elif ina0 == 1:
             thisInactiveLick = time.time()
 

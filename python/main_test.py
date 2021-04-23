@@ -142,7 +142,7 @@ def record_data(fname, mode ,record):
 print(datetime)
 # overwrite the id files before the program start
 # this will remove the rfid from previous sessions
-def overwrite_id_file():
+def overwrite_id_file(rat1, rat2, poke_counts):
     with open("/home/pi/_inactive", "w") as f:
         record = file_format.format(rat1, str(time.time()), "inactive", str(time.time()-sTime), str(poke_counts[rat1]["inact"]))
         f.write(record)
@@ -151,7 +151,6 @@ def overwrite_id_file():
         record = file_format.format(rat2, str(time.time()), "active", str(time.time()-sTime), str(poke_counts[rat2]["act"]))
         f.write(record)
 
-overwrite_id_file()
 
 file_format = "{}\t{}\t{}\t{}\t{}\n"
 def write_header():
@@ -194,6 +193,8 @@ else:
     # subprocess.call("python3 operant_test.py -schedule {} -ratio {} -sessionLength {} -rat1ID {} -rat2ID {} -timeout {} &".format(schedule, str(ratio), str(sessionLength), rat1, rat2, str(timeout), shell=True))
 
     poke_counts = {rat1:{"act": 0, "inact": 0}, rat2:{"act":0, "inact":0}}
+
+    overwrite_id_file(rat1, rat2, poke_counts)
 
     logger.info("while loop started")
 
