@@ -1,14 +1,9 @@
 #!/usr/bin/python3 
-
-
 import os
 import time
-
 from config import ROOT
 import json
-
 import sys
-
 
 DEVID_FILE = ROOT+'/deviceid'
 RATID_FILE = ROOT+'/ratids'
@@ -23,28 +18,24 @@ class IDS:
                 json_data = json.load(f)
         except FileNotFoundError:
             sys.exit("peerpub_config.json file not found in /home/pi")
-        # except FileExistsError:
-            # json_data = {
-            #         "deviceid": "Box_n",
-            #         "step":300,
-            #         "sessionid": 1
-            #         }
-            # with open(JSON_CONFIG_FILE, 'w') as outfile:
-            #     json.dump(json_data, outfile)
-
-            # with open(JSON_CONFIG_FILE, 'a') as f:
-            #     f.write(json.dumps(json_data))
             
         self.devID = json_data['deviceid']
         self.sesID = json_data['sessionid']
         self.step = json_data['step']
-    def sessionIncrement(self):
+
+    def change_step(self, step):
+        self.step = int(step)
+        self.save_data()
+
+    def save_data(self):
         f = open(JSON_CONFIG_FILE, 'w')
-        
         json.dump({
             "deviceid": self.devID,
             "step": self.step,
-            "sessionid": self.sesID + 1
+            "sessionid": self.sesID
         }, f)
-
         f.close()
+        
+    def sessionIncrement(self):
+        self.sesID + 1
+        self.save_data()

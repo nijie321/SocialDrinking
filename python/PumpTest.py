@@ -2,11 +2,10 @@
 from gpiozero import Button
 from gpiozero import DigitalInputDevice
 from pump_move import PumpMove
-
 import board
 import busio
 import adafruit_mpr121
-
+from ids import IDS
 import time
 
 file_dir = "/home/pi/SocialDrinkings/{}"
@@ -72,5 +71,9 @@ def pump_test(step_size, fname):
     date = time.strftime("%Y-%m-%d", time.localtime())
     d_time = time.strftime("%Y-%m-%d", time.localtime())
     record = "{}\t"*4
+
+    ids = IDS()
+    ids.change_step(step_size)
+
     with open(file_dir.format(fname), "w") as f:
         f.write(record.format(date, d_time, old_step, step_size))
