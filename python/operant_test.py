@@ -321,11 +321,11 @@ while lapsed < sessionLength:
 dlogger.logEvent("", time.time(), "SessionEnd", time.time()-sTime)
 
 date=time.strftime("%Y-%m-%d", time.localtime())
-d_time = time.strftime("%H:%M:%S", time.localtime())
+d_time = time.strftime("%H_%M_%S", time.localtime())
 
 formatted_schedule = schedule+str(ratio)+'TO'+str(timeout)+"_"+ rat1ID+"_"+rat2ID
 schedule_to = schedule+str(ratio)+'TO'+str(timeout)
-finallog_fname = "Soc_{}_{}_S{}_{}_{}_summary.tab".format(date,d_time,devID,sesID,formatted_schedule,sessionLength)
+finallog_fname = "Soc_{}_{}_{}_S{}_{}_{}_summary.tab".format(date,d_time,devID,sesID,formatted_schedule,sessionLength)
 
 rat1 = rats[rat1ID]
 rat2 = rats[rat2ID]
