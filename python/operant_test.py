@@ -7,7 +7,6 @@ import argparse
 import time
 from threading import Timer
 import RPi.GPIO as gpio
-# import datalogger
 from datalogger import LickLogger
 import subprocess
 import os
@@ -20,7 +19,6 @@ from pump_move import PumpMove
 from gpiozero import DigitalInputDevice
 import RPi.GPIO as GPIO
 from RatActivityCouter import RatActivityCounter
-# import RatActivityCounter
 
 import logging
 
@@ -122,8 +120,7 @@ nextratio={rat0ID:0,rat1ID:ratio, rat2ID:ratio}
 rew={rat0ID:0, rat1ID:0, rat2ID:0}
 act={rat0ID:0, rat1ID:0, rat2ID:0}
 ina={rat0ID:0, rat1ID:0, rat2ID:0}
-# lastActiveLick={rat0ID:float(sTime), rat1ID:float(sTime), rat2ID:float(sTime)}
-# lastInactiveLick={rat0ID:float(sTime), rat1ID:float(sTime), rat2ID:float(sTime)}
+
 lastActiveLick={rat0ID:{"time":float(sTime), "scantime": 0}, rat1ID:{"time":float(sTime), "scantime":0}, rat2ID:{"time":float(sTime), "scantime":0}}
 lastInactiveLick={rat0ID:{"time":float(sTime), "scantime": 0}, rat1ID:{"time":float(sTime), "scantime":0}, rat2ID:{"time":float(sTime), "scantime":0}}
 
@@ -136,11 +133,7 @@ rats = {
 }
 ##############################################################
 
-# FORWARD_LIMIT = DigitalInputDevice(18)
 FORWARD_LIMIT = GPIO.setup(FORWARD_LIMIT_BTN, GPIO.IN, pull_up_down= GPIO.PUD_DOWN)
-
-# BACKWARD_LIMIT = DigitalInputDevice(BACKWARD_LIMIT_BTN)
-
 
 pumptimedout={rat0ID:False, rat1ID:False, rat2ID:False}
 lapsed=0  # time since program start
@@ -150,7 +143,6 @@ minInterLickInterval=0.15 # minimal interlick interval (about 6-7 licks per seco
 maxISI = 15  # max lapse between RFID scan and first lick in a cluster 
 maxILI = 3 # max interval between licks used to turn an RFID into unknown.   
 
-
 def resetPumpTimeout(rat):
     # don't delete this line
     pumptimedout[rat] = False
@@ -159,7 +151,6 @@ def resetPumpTimeout(rat):
 def get_ratid_scantime(fname, this_lick, act):
     try:
         with open(fname, "r") as f:
-            # print(f.read())
             (rat, scantime, dummy1, dummy2, dummy3) = f.read().strip().split("\t")
             scantime = float(scantime)
             # print(rat, scantime, dummy1, dummy1)
@@ -175,7 +166,6 @@ def get_ratid_scantime(fname, this_lick, act):
         else:
             rat_obj = rats[rat]
             if act:
-                # print("this_lick = {}\t rat_obj.last_act_licks = {}\t scantime = {}\t".format(this_lick, rat_obj.last_act_licks["time"], scantime))
                 if this_lick - rat_obj.last_act_licks["time"] > maxILI and this_lick - scantime > maxISI:
                     rat = "ratUnknown"
             else:
@@ -184,7 +174,6 @@ def get_ratid_scantime(fname, this_lick, act):
             
     except KeyError:
         print("error from get_ratid_scantime")
-        # print("rat={}\t thislick={}\t lastlick={}\t".format(rat, this_lick, rat.last_lick))
 
     return rat, scantime
         
@@ -223,11 +212,6 @@ while lapsed < sessionLength:
               
             print("pumptimeout = {}".format(rat.pumptimedout))
 
-            # if (thisActiveLick - rat.last_act_licks["time"] > maxILI) and (thisActiveLick - scantime > maxISI):
-            #     rat = rats["ratUnknown"]
-                
-            # last_act_licks = rat.last_act_licks
-
             if(thisActiveLick - rat.last_act_licks["time"] > 1):
                 rat.update_last_licks(thisActiveLick, scantime, act=True)
             else:
@@ -257,7 +241,6 @@ while lapsed < sessionLength:
                         pumptimedout[ratid] = True
 
                         pumpTimer = Timer(timeout, resetPumpTimeout, [ratid] )
-                        # pumpTimer = Timer(timeout, resetPumpTimeout, ratid )
 
                         print("timeout on " + rat.ratid)
                         pumpTimer.start()
@@ -291,10 +274,7 @@ while lapsed < sessionLength:
             (ratid, scantime) = get_ratid_scantime("/home/pi/_inactive", thisInactiveLick, act=False)
 
             rat = rats[ratid] 
-            # if (thisInactiveLick- rat.last_inact_licks["time"] > maxILI) and (thisInactiveLick - scantime > maxISI):
-            #     rat = rats["ratUnknown"]
 
-            # last_inact_licks = rat.last_inact_licks
             if thisInactiveLick - rat.last_inact_licks["time"] > 1:
                 rat.update_last_licks(thisInactiveLick, scantime, act=False)
             else:
@@ -327,15 +307,22 @@ formatted_schedule = schedule+str(ratio)+'TO'+str(timeout)+"_"+ rat1ID+"_"+rat2I
 schedule_to = schedule+str(ratio)+'TO'+str(timeout)
 finallog_fname = "Soc_{}_{}_{}_S{}_{}_{}_summary.tab".format(date,d_time,devID,sesID,formatted_schedule,sessionLength)
 
-rat1 = rats[rat1ID]
-rat2 = rats[rat2ID]
-rat0 = rats[rat0ID]
+# rat1 = rats[rat1ID]
+# rat2 = rats[rat2ID]
+# rat0 = rats[rat0ID]
+# data_dict = {
+#             "ratID1":[rat1ID, date,d_time,devID,sesID,schedule_to,sessionLength,rat1.active_licks,rat1.inactive_licks,rat1.rewards],
+#             "ratID2":[rat2ID, date,d_time,devID,sesID,schedule_to,sessionLength,rat2.active_licks,rat2.inactive_licks,rat2.rewards],
+#             "ratID0":[rat0ID, date,d_time,devID,sesID,schedule_to,sessionLength,rat0.active_licks,rat0.inactive_licks,rat0.rewards]
+#             }
 
-data_dict = {
-            "ratID1":[rat1ID, date,d_time,devID,sesID,schedule_to,sessionLength,rat1.active_licks,rat1.inactive_licks,rat1.rewards],
-            "ratID2":[rat2ID, date,d_time,devID,sesID,schedule_to,sessionLength,rat2.active_licks,rat2.inactive_licks,rat2.rewards],
-            "ratID0":[rat0ID, date,d_time,devID,sesID,schedule_to,sessionLength,rat0.active_licks,rat0.inactive_licks,rat0.rewards]
-            }
+data_dict = {}
+for rat_key, rat_rfid in zip(["ratID1","ratID2","ratID0"], [rat1ID, rat2ID, rat0ID]):
+    rat = rats[rat_rfid]
+    data_dict[rat_key] = [rat_rfid, date, d_time, devID, sesID, schedule_to, \
+                            sessionLength, rat.active_licks, rat.inactive_licks, \
+                                rat.rewards]
+
 
 LickLogger.finalLog(finallog_fname, data_dict, rfid_file)
 

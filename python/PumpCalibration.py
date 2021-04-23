@@ -11,7 +11,7 @@ import time
 file_dir = "/home/pi/SocialDrinkings/{}"
 
 
-def pump_test(step_size, fname):
+def pump_calibration(step_size, fname):
     old_step = step_size
     # command = input("Please scan the ") 
     act_count = 0

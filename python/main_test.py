@@ -13,7 +13,7 @@ from config import DATA_DIR, DATA_PREFIX, COMMAND_IDS, ROOT, get_sessioninfo
 
 import argparse
 
-from PumpTest import pump_test
+from PumpCalibration import pump_calibration
 
 import logging
 
@@ -60,13 +60,14 @@ motor_step = ids.step
 
 sTime=time.time()
 
-TEST_SESSION = False
+
+PUMP_CALIBRATION = False
 UPDATE_REPO = False
 
 RatID = input("please scan a command RFID\n")[-8:]
 
 if RatID[-2:] == "6b" or RatID[-2:] == "ba":
-    TEST_SESSION = True
+    PUMP_CALIBRATION = True
 
 if RatID[-1:] == "0c" or RatID[-2:] == "fe":
     UPDATE_REPO = True
@@ -74,7 +75,7 @@ if RatID[-1:] == "0c" or RatID[-2:] == "fe":
 if UPDATE_REPO:
     subprocess.call("bash /home/pi/openbehavior/PeerPub/utility_script/update_repo.sh &", shell=True)
 
-if not TEST_SESSION:
+if not PUMP_CALIBRATION:
 
     sessioninfo = get_sessioninfo(RatID)
 
@@ -161,9 +162,9 @@ def write_header():
         logger.exception("unable to open the file")
 
 
-if TEST_SESSION:
+if PUMP_CALIBRATION:
     logger.info("pump test started")
-    pump_test(motor_step, "{}_steps".format(ids.devID))
+    pump_calibration(motor_step, "{}_steps".format(ids.devID))
 else:
     rat1, rat2 = scan_rats()
 
