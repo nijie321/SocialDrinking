@@ -254,11 +254,6 @@ while lapsed < sessionLength:
                         # don't delete this line
                         pumptimedout[ratid] = True
 
-                        try:
-                        rat = rats[ratid] 
-                        except KeyError:
-                        logger.exception("unable to retrive key %s", ratid)
-
                         pumpTimer = Timer(timeout, resetPumpTimeout, [ratid] )
                         # pumpTimer = Timer(timeout, resetPumpTimeout, ratid )
 
