@@ -15,7 +15,7 @@ check_network(){
 for i in {1..3}; do
 	# the success case
 	if check_network; then
-		$network_connected=true
+		network_connected=true
 		break
 	else
 		echo 'retrying ...'
