@@ -55,6 +55,7 @@ parser.add_argument('-rat2ID',  type=str, default="rat2")
 parser.add_argument('-rfidFile',  type=str)
 parser.add_argument('-devID', type=str)
 parser.add_argument('-sesID', type=int)
+parser.add_argument('-step', type=int)
 args=parser.parse_args()
 
 # exp setting
@@ -65,6 +66,7 @@ timeout=args.timeout
 rat1ID=args.rat1ID
 rat2ID=args.rat2ID
 rat0ID="ratUnknown"
+step=args.step
 
 devID = args.devID
 sesID = args.sesID
@@ -268,11 +270,7 @@ while lapsed < sessionLength:
                         else:
                             dlogger.logEvent(rat.ratid, time.time()- scantime, "REWARD", time.time() - sTime)
                             mover = PumpMove()
-                            if(float(sessionLength) / 3600 == 16.0):
-                                mover.move("forward", 130)
-                            else:
-                                mover.move("forward", 150)
-
+                            mover.move("forward", step)                            
                             del(mover)
 
                         RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
