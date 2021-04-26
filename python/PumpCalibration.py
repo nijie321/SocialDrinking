@@ -7,6 +7,7 @@ import busio
 import adafruit_mpr121
 from ids import IDS
 import time
+import math
 
 file_dir = "/home/pi/SocialDrinking/{}"
 
@@ -64,10 +65,11 @@ def pump_calibration(step_size, fname):
                 avg_measured_value = response / 3
                 print("average value: {}".format(avg_measured_value))
                 
-                if (avg_measured_value < (300-10) and avg_measured_value > (300+10)):
+                if (avg_measured_value < (300-10) or avg_measured_value > (300+10)):
                     # update step size
                     print("previous step: {}".format(step))
-                    step = ( (step*5 / 300) * avg_measured_value )  / 5
+                    step = math.ceil( (step / (avg_measured_value / 5)) *60  )
+                    
                     print("modified step: {}".format(step))
                 
                 act_count = 0
