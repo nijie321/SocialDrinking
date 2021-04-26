@@ -43,7 +43,7 @@ def pump_calibration(step_size, fname):
     while True:
         time.sleep(0.050)
         act = mpr121.touched_pins[1]
-        global step
+
         if act:
             if act_count % 5 == 0:
                 for i in range(5):
@@ -62,10 +62,13 @@ def pump_calibration(step_size, fname):
                         response = int(input("please re-enter the amount measured: ").strip())
 
                 avg_measured_value = response / 3
+                print("average value: {}".format(avg_measured_value))
                 
                 if (avg_measured_value < (300-10) and avg_measured_value > (300+10)):
                     # update step size
+                    print("previous step: {}".format(step))
                     step = ( (step*5 / 300) * avg_measured_value )  / 5
+                    print("modified step: {}".format(step))
                 
                 act_count = 0
 
