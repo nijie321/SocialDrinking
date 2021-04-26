@@ -8,11 +8,12 @@ import adafruit_mpr121
 from ids import IDS
 import time
 
-file_dir = "/home/pi/SocialDrinkings/{}"
+file_dir = "/home/pi/SocialDrinking/{}"
 
 
 def pump_calibration(step_size, fname):
     old_step = step_size
+    step = step_size
     # command = input("Please scan the ") 
     act_count = 0
     i2c = busio.I2C(board.SCL, board.SDA)
@@ -42,17 +43,17 @@ def pump_calibration(step_size, fname):
     while True:
         time.sleep(0.050)
         act = mpr121.touched_pins[1]
-
+        global step
         if act:
             if act_count % 5 == 0:
                 for i in range(5):
-                    mover.move("forward", step_size)
+                    mover.move("forward", step)
 
             act_count += 1
 
             if act_count == 15:
                 response = input("please enter the amount measured (numeric value) or scan the command id again to exit: ").strip()
-                if response[-2:] == '16' or response[-2:] == '89':
+                if response[-2:] == '16' or response[-2:] == '89' or response[-2:] == 'ba':
                     break
                 else:
                     try:
@@ -64,7 +65,7 @@ def pump_calibration(step_size, fname):
                 
                 if (avg_measured_value < (300-10) and avg_measured_value > (300+10)):
                     # update step size
-                    step_size = ( (step_size*5 / 300) * avg_measured_value )  / 5
+                    step = ( (step*5 / 300) * avg_measured_value )  / 5
                 
                 act_count = 0
 
@@ -73,7 +74,18 @@ def pump_calibration(step_size, fname):
     record = "{}\t"*4
 
     ids = IDS()
-    ids.change_step(step_size)
+    print("old step size: {}".format(old_step))
+    print("new step size: {}".format(step))
+    ids.change_step(step)
 
-    with open(file_dir.format(fname), "w") as f:
-        f.write(record.format(date, d_time, old_step, step_size))
+    try:
+        with open(file_dir.format(fname), "w") as f:
+            f.write(record.format(date, d_time, old_step, step))
+    except FileNotFoundError:
+        f = open(file_dir.format(fname), "x")
+        f.close()
+        with open(file_dir.format(fname), "w") as f:
+            f.write(record.format(date, d_time, old_step, step))
+    finally:
+        del(mover)
+
