@@ -87,10 +87,14 @@ def pump_calibration(step_size, fname):
         with open(file_dir.format(fname), "w") as f:
             f.write(record.format(date, d_time, old_step, step))
     except FileNotFoundError:
-        f = open(file_dir.format(fname), "x")
-        f.close()
-        with open(file_dir.format(fname), "w") as f:
+        # open file and append, if file does not exist, create one.
+        # same as the following 4 lines of code but terser
+        with open(file_dir.format(fname), "a") as f:
             f.write(record.format(date, d_time, old_step, step))
+        # f = open(file_dir.format(fname), "x")
+        # f.close()
+        # with open(file_dir.format(fname), "w") as f:
+        #     f.write(record.format(date, d_time, old_step, step))
     finally:
         del(mover)
 
