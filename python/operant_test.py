@@ -307,15 +307,6 @@ formatted_schedule = schedule+str(ratio)+'TO'+str(timeout)+"_"+ rat1ID+"_"+rat2I
 schedule_to = schedule+str(ratio)+'TO'+str(timeout)
 finallog_fname = "Soc_{}_{}_{}_S{}_{}_{}_summary.tab".format(date,d_time,devID,sesID,formatted_schedule,sessionLength)
 
-# rat1 = rats[rat1ID]
-# rat2 = rats[rat2ID]
-# rat0 = rats[rat0ID]
-# data_dict = {
-#             "ratID1":[rat1ID, date,d_time,devID,sesID,schedule_to,sessionLength,rat1.active_licks,rat1.inactive_licks,rat1.rewards],
-#             "ratID2":[rat2ID, date,d_time,devID,sesID,schedule_to,sessionLength,rat2.active_licks,rat2.inactive_licks,rat2.rewards],
-#             "ratID0":[rat0ID, date,d_time,devID,sesID,schedule_to,sessionLength,rat0.active_licks,rat0.inactive_licks,rat0.rewards]
-#             }
-
 data_dict = {}
 for rat_key, rat_rfid in zip(["ratID1","ratID2","ratID0"], [rat1ID, rat2ID, rat0ID]):
     rat = rats[rat_rfid]

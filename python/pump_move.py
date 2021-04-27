@@ -46,7 +46,8 @@ class PumpMove:
                           }
         
         self.step_counts = steps
-        self.delay = .0209 / 50
+        # self.delay = .0209 / 50
+        self.delay = .0209 / 40
         # self.delay = 0.005
         self.rotate_dir = rotate_dir
 

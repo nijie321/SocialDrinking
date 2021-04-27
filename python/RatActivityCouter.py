@@ -57,15 +57,6 @@ class RatActivityCounter():
             RatActivityCounter.colored_print(rat.ratid, rat.active_licks,
                                              rat.inactive_licks, rat.rewards,
                                              rat.pumptimedout)
-        # RatActivityCounter.colored_print(rat1.ratid, rat1.active_licks,
-        #                                  rat1.inactive_licks, rat1.rewards,
-        #                                  rat1.pumptimedout)
-        # RatActivityCounter.colored_print(rat2.ratid, rat2.active_licks,
-        #                                  rat2.inactive_licks, rat2.rewards,
-        #                                  rat2.pumptimedout)
-        # RatActivityCounter.colored_print(rat_unknown.ratid, rat_unknown.active_licks,
-        #                                  rat_unknown.inactive_licks, rat_unknown.rewards,
-        #                                  rat_unknown.pumptimedout)
         return time.time() 
 
     def incr_rewards(self):
