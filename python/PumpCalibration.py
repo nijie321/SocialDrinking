@@ -8,7 +8,8 @@ import adafruit_mpr121
 from ids import IDS
 import time
 import math
-
+import subprocess
+import os
 file_dir = "/home/pi/SocialDrinking/{}"
 
 
@@ -74,8 +75,10 @@ def pump_calibration(step_size, fname):
                 
                 act_count = 0
 
-    date = time.strftime("%Y-%m-%d", time.localtime())
-    d_time = time.strftime("%Y-%m-%d", time.localtime())
+    del(mover)
+
+    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    # d_time = time.strftime("%Y-%m-%d", time.localtime())
     record = "{}\t"*4
 
     ids = IDS()
@@ -83,18 +86,17 @@ def pump_calibration(step_size, fname):
     print("new step size: {}".format(step))
     ids.change_step(step)
 
-    try:
-        with open(file_dir.format(fname), "w") as f:
-            f.write(record.format(date, d_time, old_step, step))
-    except FileNotFoundError:
-        # open file and append, if file does not exist, create one.
-        # same as the following 4 lines of code but terser
-        with open(file_dir.format(fname), "a") as f:
-            f.write(record.format(date, d_time, old_step, step))
-        # f = open(file_dir.format(fname), "x")
-        # f.close()
-        # with open(file_dir.format(fname), "w") as f:
-        #     f.write(record.format(date, d_time, old_step, step))
-    finally:
-        del(mover)
+    # get latest git information
+    command = "cd /home/pi/openbehavior/PeerPub/ && git log -1 --pretty=oneline"
+    git_info = subprocess.Popen(command,shell=True, stdout=subprocess.PIPE) 
+    git_info = git_info.stdout.read().decode('utf-8').strip()
 
+    f_specifiers = ""
+    file_path = file_dir.format(fname)
+    if os.path.isfile(file_path):
+        f_specifiers = "w"
+    else:
+        f_specifiers = "a"
+
+    with open(file_path, f_specifiers) as f:
+        f.write(record.format(date, old_step, step) + "\n" + git_info + "\n")
