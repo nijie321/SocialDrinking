@@ -60,8 +60,8 @@ class RatActivityCounter():
                                              rat.pumptimedout)
         return time.time() 
     
-    def set_syringe_empty(self):
-        self.syringe_empty = True
+    def increase_syringe_empty(self):
+        self.syringe_empty += 1
 
     def incr_rewards(self):
         self.rewards += 1

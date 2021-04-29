@@ -152,9 +152,7 @@ def get_ratid_scantime(fname, this_lick, act):
     try:
         with open(fname, "r") as f:
             rat, scantime, *dummies = f.read().strip().split("\t")
-            # (rat, scantime, dummy1, dummy2, dummy3) = f.read().strip().split("\t")
             scantime = float(scantime)
-            # print(rat, scantime, dummy1, dummy1)
             
     except (OSError, ValueError) as e:
         logging.exception("ratid error: %s", e)
@@ -187,6 +185,17 @@ def houselight_check():
             houselight_on = True
             subprocess.call(blink_light_command, shell=True)
            
+def reload_syringe():
+    BACKWARD_LIMIT = DigitalInputDevice("GPIO23")
+    def backward():
+        while BACKWARD_LIMIT.value != 1:
+            mover.move("backward")
+    
+    mover = PumpMove()
+    while BACKWARD_LIMIT.value != 1:
+        mover.move("backward")
+    del(mover)
+        
          
 while lapsed < sessionLength:
     try:
@@ -198,6 +207,7 @@ while lapsed < sessionLength:
         lapsed = time.time() - sTime
 
         if GPIO.input(FORWARD_LIMIT_BTN):
+            reload_syringe()
             FORWARD_LIMIT_REACHED = True
 
         if act1 == 1:
@@ -216,7 +226,12 @@ while lapsed < sessionLength:
                 rat.update_last_licks(thisActiveLick, scantime, act=True)
             else:
                 rat.incr_active_licks()
-                if not FORWARD_LIMIT_REACHED:
+
+                if FORWARD_LIMIT_REACHED:
+                    dlogger.logEvent(rat.ratid, time.time(), "syringe empty", time.time() - sTime) 
+                    rat.increase_syringe_empty()
+                    FORWARD_LIMIT_REACHED = False
+                else:
                     dlogger.logEvent(rat.ratid, time.time() - rat.last_act_licks["scantime"], "ACTIVE", lapsed, rat.next_ratio) # add next ratio
 
                 rat.update_last_licks(thisActiveLick, scantime, act=True)
@@ -241,17 +256,16 @@ while lapsed < sessionLength:
                         print("timeout on " + rat.ratid)
                         pumpTimer.start()
 
-                        if not FORWARD_LIMIT_REACHED:
-                            subprocess.call('sudo python ' + './blinkenlights.py -reward_happened True&', shell=True)
-
-                        if FORWARD_LIMIT_REACHED:
-                            rat.set_syringe_empty()
-                            dlogger.logEvent(rat.ratid,time.time(), "syringe empty", time.time() - sTime)
-                        else:
-                            dlogger.logEvent(rat.ratid, time.time()- scantime, "REWARD", time.time() - sTime)
-                            mover = PumpMove()
-                            mover.move("forward", step)                            
-                            del(mover)
+                        # if not FORWARD_LIMIT_REACHED:
+                        subprocess.call('sudo python ' + './blinkenlights.py -reward_happened True&', shell=True)
+                        # if FORWARD_LIMIT_REACHED:
+                        #     rat.increase_syringe_empty()
+                        #     FORWARD_LIMIT_REACHED = False
+                        # else:
+                        dlogger.logEvent(rat.ratid, time.time()- scantime, "REWARD", time.time() - sTime)
+                        mover = PumpMove()
+                        mover.move("forward", step)                            
+                        del(mover)
 
                         RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
                                                 rats[rat1ID],rats[rat2ID],rats[rat0ID])
