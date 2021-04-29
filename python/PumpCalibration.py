@@ -99,4 +99,4 @@ def pump_calibration(step_size, fname):
         f_specifiers = "a"
 
     with open(file_path, f_specifiers) as f:
-        f.write(record.format(date, old_step, step) + "\n" + git_info + "\n")
+        f.write(("{}\n"+record+"\n").format(git_info, date, old_step, step))

@@ -48,13 +48,11 @@ class LickLogger:
                     poke_counts[rid]["inact"] = int(poke_count.strip())
 
         with open(DATA_DIR+ "/" + fname, "a+") as f:
-            # header = (("{}\t"*11).format("ratID", "date", "devID", "sessionID", "schedule", "sessionLen", "activeCount", "inactiveCount", "rewardCount","activePoke", "inactivePoke") ) + "\n"
             print(DATA_DIR + "/" + fname)
-            ID1_str = (("{}\t"*12).format(*data_dict["ratID1"], poke_counts[ratids[0]]["act"], poke_counts[ratids[0]]["inact"])) + "\n"
-            ID2_str = (("{}\t"*12).format(*data_dict["ratID2"], poke_counts[ratids[1]]["act"], poke_counts[ratids[1]]["inact"])) + "\n"
-            ID0_str = (("{}\t"*12).format(*data_dict["ratID0"], 0, 0)) + "\n"
+            ID1_str = (("{}\t"*13).format(*data_dict["ratID1"], poke_counts[ratids[0]]["act"], poke_counts[ratids[0]]["inact"])) + "\n"
+            ID2_str = (("{}\t"*13).format(*data_dict["ratID2"], poke_counts[ratids[1]]["act"], poke_counts[ratids[1]]["inact"])) + "\n"
+            ID0_str = (("{}\t"*13).format(*data_dict["ratID0"], 0, 0)) + "\n"
             f.write(ID1_str + ID2_str + ID0_str)
-            # f.write(header + ID1_str + ID2_str + ID0_str)
         
                 
 

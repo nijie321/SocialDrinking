@@ -7,6 +7,7 @@ class RatActivityCounter():
         self.inactive_licks = 0
         self.rewards = 0
         self.touch_counter = 0
+        self.syringe_empty = 0
         self.next_ratio = ratio
         self.rat_label = rat_label
         self.last_act_licks = {"time":float(time.time()), "scantime":0}
@@ -58,6 +59,9 @@ class RatActivityCounter():
                                              rat.inactive_licks, rat.rewards,
                                              rat.pumptimedout)
         return time.time() 
+    
+    def set_syringe_empty(self):
+        self.syringe_empty = True
 
     def incr_rewards(self):
         self.rewards += 1

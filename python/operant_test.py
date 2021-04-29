@@ -151,7 +151,8 @@ def resetPumpTimeout(rat):
 def get_ratid_scantime(fname, this_lick, act):
     try:
         with open(fname, "r") as f:
-            (rat, scantime, dummy1, dummy2, dummy3) = f.read().strip().split("\t")
+            rat, scantime, *dummies = f.read().strip().split("\t")
+            # (rat, scantime, dummy1, dummy2, dummy3) = f.read().strip().split("\t")
             scantime = float(scantime)
             # print(rat, scantime, dummy1, dummy1)
             
@@ -183,7 +184,6 @@ def houselight_check():
     blink_light_command = "sudo python ./blinkenlights.py &"
     if not FORWARD_LIMIT_REACHED:
         if (time.localtime().tm_hour >= 21 and houselight_on is False) or (time.localtime().tm_hour >= 9 and time.localtime().tm_hour < 21) and houselight_on:
-            print("inside houselight check")
             houselight_on = True
             subprocess.call(blink_light_command, shell=True)
            
@@ -216,9 +216,7 @@ while lapsed < sessionLength:
                 rat.update_last_licks(thisActiveLick, scantime, act=True)
             else:
                 rat.incr_active_licks()
-                if FORWARD_LIMIT_REACHED:
-                    dlogger.logEvent(rat.ratid, time.time(), "syringe empty", time.time() - sTime) 
-                else:
+                if not FORWARD_LIMIT_REACHED:
                     dlogger.logEvent(rat.ratid, time.time() - rat.last_act_licks["scantime"], "ACTIVE", lapsed, rat.next_ratio) # add next ratio
 
                 rat.update_last_licks(thisActiveLick, scantime, act=True)
@@ -230,9 +228,7 @@ while lapsed < sessionLength:
 
                 # if not rat.pumptimedout:
                 if not pumptimedout[ratid]:
-                
                     rat.incr_touch_counter()
-
                     if rat.touch_counter >= rat.next_ratio and rat.ratid != "ratUnknown":
                         rat.incr_rewards()
                         rat.reset_touch_counter()
@@ -249,6 +245,7 @@ while lapsed < sessionLength:
                             subprocess.call('sudo python ' + './blinkenlights.py -reward_happened True&', shell=True)
 
                         if FORWARD_LIMIT_REACHED:
+                            rat.set_syringe_empty()
                             dlogger.logEvent(rat.ratid,time.time(), "syringe empty", time.time() - sTime)
                         else:
                             dlogger.logEvent(rat.ratid, time.time()- scantime, "REWARD", time.time() - sTime)
@@ -312,7 +309,7 @@ for rat_key, rat_rfid in zip(["ratID1","ratID2","ratID0"], [rat1ID, rat2ID, rat0
     rat = rats[rat_rfid]
     data_dict[rat_key] = [rat_rfid, date, d_time, devID, sesID, schedule_to, \
                             sessionLength, rat.active_licks, rat.inactive_licks, \
-                                rat.rewards]
+                                rat.syringe_empty, rat.rewards]
 
 
 LickLogger.finalLog(finallog_fname, data_dict, rfid_file)
