@@ -79,7 +79,7 @@ def pump_calibration(step_size, fname):
 
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     # d_time = time.strftime("%Y-%m-%d", time.localtime())
-    record = "{}\t"*4
+    record = "{}\t"*3
 
     ids = IDS()
     print("old step size: {}".format(old_step))
