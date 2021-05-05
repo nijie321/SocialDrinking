@@ -181,17 +181,18 @@ hexNutGroveExtraDepth=2;
 screwRadius=1.75;
 screwDepth=9.35;
 
-translate([-4.5,0,-17]) union(){
-    rotate([90,0,0]) translate([(width/2) - (topWidth/2),-(extraHeight - (height/2) - offsetFromCenter) ,-1.5]) cylinder(d=21.95 + .2,h=3.5,$fn=50,center=true);
+translate([-4.5,0,-17+1.9 + 1]) union(){
+    rotate([90,0,0]) translate([(width/2) - (topWidth/2),-(extraHeight - (height/2) - offsetFromCenter) ,-1.5]) cylinder(d=21.95 + .1,h=7,$fn=50,center=true);
     
     rotate([90,0,0]) translate([(width/2) - (topWidth/2),-(extraHeight - (height/2) - offsetFromCenter),0]) cylinder(h=15,d=10 + .2 ,$fn=50,center=true);
     
-    rotate([90,0,0]) union(){
-translate([(width/2) - (topWidth/2),-(extraHeight - (height/2) - offsetFromCenter)-7.75 ,0]) cylinder(h=15,d=3.75,$fn=50,center=true);
-translate([(width/2) - (topWidth/2) -7.75 ,-(extraHeight - (height/2) - offsetFromCenter),0]) cylinder(h=15,d=3.75,$fn=50,center=true);
-translate([(width/2) - (topWidth/2) +7.75 ,-(extraHeight - (height/2) - offsetFromCenter),0]) cylinder(h=15,d=3.75,$fn=50,center=true);
-translate([(width/2) - (topWidth/2) ,-(extraHeight - (height/2) - offsetFromCenter) + 7.75 ,0]) cylinder(h=15,d=3.75,$fn=50,center=true);
-}
+//    rotate([90,0,0]) union(){
+//translate([(width/2) - (topWidth/2),-(extraHeight - (height/2) - offsetFromCenter)-7.75 ,0]) cylinder(h=15,d=3.75,$fn=50,center=true);
+//translate([(width/2) - (topWidth/2) -7.75 ,-(extraHeight - (height/2) - offsetFromCenter),0]) cylinder(h=15,d=3.75,$fn=50,center=true);
+//translate([(width/2) - (topWidth/2) +7.75 ,-(extraHeight - (height/2) - offsetFromCenter),0]) cylinder(h=15,d=3.75,$fn=50,center=true);
+//translate([(width/2) - (topWidth/2) ,-(extraHeight - (height/2) - offsetFromCenter) + 7.75 ,0]) cylinder(h=15,d=3.75,$fn=50,center=true);
+//}
+    
 }
 
 }
