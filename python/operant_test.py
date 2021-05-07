@@ -16,13 +16,13 @@ import busio # MPR121
 import adafruit_mpr121
 import ids
 from pump_move import PumpMove
-from gpiozero import DigitalInputDevice
+# from gpiozero import DigitalInputDevice
 import RPi.GPIO as GPIO
 from RatActivityCouter import RatActivityCounter
-
 import logging
-
 from slackbot import send_message
+from utils import reload_syringe, get_ratid_scantime, houselight_check
+
 
 # logger
 logger = logging.getLogger('operant_log')
@@ -102,9 +102,6 @@ gpio.setup(TOUCHLED, gpio.OUT)
 datetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 date=time.strftime("%Y-%m-%d", time.localtime())
 
-# deal with session and box ID, and data file location
-# ids=ids.IDS()
-
 # Initialize data logger 
 dlogger = LickLogger(devID, sesID)
 dlogger.createDataFile(schedule="{}{}TO{}".format(schedule,str(ratio),str(timeout)) , ratIDs=rat1ID+"_"+rat2ID, sessLen=sessionLength)
@@ -125,7 +122,6 @@ ina={rat0ID:0, rat1ID:0, rat2ID:0}
 
 lastActiveLick={rat0ID:{"time":float(sTime), "scantime": 0}, rat1ID:{"time":float(sTime), "scantime":0}, rat2ID:{"time":float(sTime), "scantime":0}}
 lastInactiveLick={rat0ID:{"time":float(sTime), "scantime": 0}, rat1ID:{"time":float(sTime), "scantime":0}, rat2ID:{"time":float(sTime), "scantime":0}}
-
 
 ##############################################################
 rats = {
@@ -150,55 +146,6 @@ def resetPumpTimeout(rat):
     pumptimedout[rat] = False
     rats[rat].pumptimedout = False
 
-def get_ratid_scantime(fname, this_lick, act):
-    try:
-        with open(fname, "r") as f:
-            rat, scantime, *dummies = f.read().strip().split("\t")
-            scantime = float(scantime)
-            
-    except (OSError, ValueError) as e:
-        logging.exception("ratid error: %s", e)
-        rat = "ratUnknown"
-        scantime = 0
-
-    try:
-        if rat is None:
-            rat = "ratUnknown"
-        else:
-            rat_obj = rats[rat]
-            if act:
-                if this_lick - rat_obj.last_act_licks["time"] > maxILI and this_lick - scantime > maxISI:
-                    rat = "ratUnknown"
-            else:
-                if this_lick - rat_obj.last_inact_licks["time"] > maxILI and this_lick - scantime > maxISI:
-                    rat = "ratUnknown"
-            
-    except KeyError:
-        print("error from get_ratid_scantime")
-
-    return rat, scantime
-        
-houselight_on = False
-def houselight_check():
-    global houselight_on
-    blink_light_command = "sudo python ./blinkenlights.py &"
-    if not FORWARD_LIMIT_REACHED:
-        if (time.localtime().tm_hour >= 21 and houselight_on is False) or (time.localtime().tm_hour >= 9 and time.localtime().tm_hour < 21) and houselight_on:
-            houselight_on = True
-            subprocess.call(blink_light_command, shell=True)
-           
-def reload_syringe():
-    BACKWARD_LIMIT = DigitalInputDevice("GPIO23")
-    def backward():
-        while BACKWARD_LIMIT.value != 1:
-            mover.move("backward")
-    
-    mover = PumpMove()
-    while BACKWARD_LIMIT.value != 1:
-        mover.move("backward")
-    del(mover)
-        
-         
 while lapsed < sessionLength:
     try:
         houselight_check()
@@ -217,7 +164,7 @@ while lapsed < sessionLength:
         if act1 == 1:
             thisActiveLick=time.time()
             
-            (ratid, scantime) = get_ratid_scantime("/home/pi/_active", thisActiveLick, act=True)
+            (ratid, scantime) = get_ratid_scantime("/home/pi/_active", thisActiveLick, True, maxILI, maxISI)
             
             try:
               rat = rats[ratid] 
@@ -286,7 +233,7 @@ while lapsed < sessionLength:
         elif ina0 == 1:
             thisInactiveLick = time.time()
 
-            (ratid, scantime) = get_ratid_scantime("/home/pi/_inactive", thisInactiveLick, act=False)
+            (ratid, scantime) = get_ratid_scantime("/home/pi/_inactive", thisInactiveLick, False, maxILI, maxISI)
 
             rat = rats[ratid] 
 
