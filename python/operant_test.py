@@ -22,6 +22,8 @@ from RatActivityCouter import RatActivityCounter
 
 import logging
 
+from slackbot import send_message
+
 # logger
 logger = logging.getLogger('operant_log')
 logger.setLevel(logging.DEBUG)
@@ -228,6 +230,8 @@ while lapsed < sessionLength:
                 rat.incr_active_licks()
 
                 if FORWARD_LIMIT_REACHED:
+                    payload = {'text': 'SYRINGE EMPTIED!!! PLEASE RELOAD'}
+                    send_message(payload)
                     dlogger.logEvent(rat.ratid, time.time(), "syringe empty", time.time() - sTime) 
                     rat.increase_syringe_empty()
                     FORWARD_LIMIT_REACHED = False
