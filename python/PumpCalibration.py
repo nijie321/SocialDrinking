@@ -87,9 +87,9 @@ def pump_calibration(step_size, fname):
     ids.change_step(step)
 
     # get latest git information
-    command = "cd /home/pi/openbehavior/PeerPub/ && git log -1 --pretty=oneline"
-    git_info = subprocess.Popen(command,shell=True, stdout=subprocess.PIPE) 
-    git_info = git_info.stdout.read().decode('utf-8').strip()
+    # command = "cd /home/pi/openbehavior/PeerPub/ && git log -1 --pretty=oneline"
+    # git_info = subprocess.Popen(command,shell=True, stdout=subprocess.PIPE) 
+    # git_info = git_info.stdout.read().decode('utf-8').strip()
 
     f_specifiers = ""
     file_path = file_dir.format(fname)
@@ -99,4 +99,4 @@ def pump_calibration(step_size, fname):
         f_specifiers = "a"
 
     with open(file_path, f_specifiers) as f:
-        f.write(("{}\n"+record+"\n").format(git_info, date, old_step, step))
+        f.write((record+"\n").format(date, old_step, step))

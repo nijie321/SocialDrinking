@@ -2,8 +2,10 @@
 
 cd /home/pi/openbehavior/PeerPub/
 
-git pull --depth 1
+git reset --hard && git pull --depth 1
 
-sleep 5
+git log -1 --pretty=oneline >> /home/pi/SocialDrinking/${BOXID}_update
+
+sleep 30
 
 sudo reboot
