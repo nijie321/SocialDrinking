@@ -209,6 +209,8 @@ while lapsed < sessionLength:
         lapsed = time.time() - sTime
 
         if GPIO.input(FORWARD_LIMIT_BTN):
+            payload = {'text': '{} SYRINGE EMPTIED!!! PLEASE RELOAD'.format(devID)}
+            send_message(payload)
             reload_syringe()
             FORWARD_LIMIT_REACHED = True
 
@@ -230,8 +232,6 @@ while lapsed < sessionLength:
                 rat.incr_active_licks()
 
                 if FORWARD_LIMIT_REACHED:
-                    payload = {'text': 'SYRINGE EMPTIED!!! PLEASE RELOAD'}
-                    send_message(payload)
                     dlogger.logEvent(rat.ratid, time.time(), "syringe empty", time.time() - sTime) 
                     rat.increase_syringe_empty()
                     FORWARD_LIMIT_REACHED = False
