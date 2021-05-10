@@ -74,6 +74,7 @@ if RatID[-1:] == "0c" or RatID[-2:] == "fe":
 
 if UPDATE_REPO:
     subprocess.call("bash /home/pi/openbehavior/PeerPub/utility_script/update_repo.sh &", shell=True)
+    sys.exit()
 
 if not PUMP_CALIBRATION:
 
