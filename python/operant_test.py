@@ -21,7 +21,7 @@ import RPi.GPIO as GPIO
 from RatActivityCouter import RatActivityCounter
 import logging
 from slackbot import send_message
-from utils import reload_syringe, get_ratid_scantime, houselight_check
+from utils import reload_syringe, get_ratid_scantime #, houselight_check
 
 
 # logger
@@ -145,6 +145,15 @@ def resetPumpTimeout(rat):
     pumptimedout[rat] = False
     rats[rat].pumptimedout = False
 
+houselight_on = False
+def houselight_check():
+    global houselight_on
+    blink_light_command = "sudo python ./blinkenlights.py &"
+    if not FORWARD_LIMIT_REACHED:
+        if (time.localtime().tm_hour >= 21 and houselight_on is False) or (time.localtime().tm_hour >= 9 and time.localtime().tm_hour < 21) and houselight_on:
+            houselight_on = True
+            subprocess.call(blink_light_command, shell=True)
+
 while lapsed < sessionLength:
     try:
         houselight_check()
@@ -165,7 +174,7 @@ while lapsed < sessionLength:
         if act1 == 1:
             thisActiveLick=time.time()
             
-            (ratid, scantime) = get_ratid_scantime("/home/pi/_active", thisActiveLick, True, maxILI, maxISI)
+            (ratid, scantime) = get_ratid_scantime(rats, "/home/pi/_active", thisActiveLick, True, maxILI, maxISI)
             
             try:
               rat = rats[ratid] 
@@ -228,7 +237,7 @@ while lapsed < sessionLength:
         elif ina0 == 1:
             thisInactiveLick = time.time()
 
-            (ratid, scantime) = get_ratid_scantime("/home/pi/_inactive", thisInactiveLick, False, maxILI, maxISI)
+            (ratid, scantime) = get_ratid_scantime(rats, "/home/pi/_inactive", thisInactiveLick, False, maxILI, maxISI)
 
             rat = rats[ratid] 
 

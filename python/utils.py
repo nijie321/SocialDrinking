@@ -1,18 +1,17 @@
 
-
 # HOUSE LIGHTS
-houselight_on = False
-def houselight_check():
-    global houselight_on
-    blink_light_command = "sudo python ./blinkenlights.py &"
-    if not FORWARD_LIMIT_REACHED:
-        if (time.localtime().tm_hour >= 21 and houselight_on is False) or (time.localtime().tm_hour >= 9 and time.localtime().tm_hour < 21) and houselight_on:
-            houselight_on = True
-            subprocess.call(blink_light_command, shell=True)
+# houselight_on = False
+# def houselight_check(houselight_on):
+#     # global houselight_on
+#     blink_light_command = "sudo python ./blinkenlights.py &"
+#     if not FORWARD_LIMIT_REACHED:
+#         if (time.localtime().tm_hour >= 21 and houselight_on is False) or (time.localtime().tm_hour >= 9 and time.localtime().tm_hour < 21) and houselight_on:
+#             houselight_on = True
+#             subprocess.call(blink_light_command, shell=True)
 
 
 # RATID
-def get_ratid_scantime(fname, this_lick, act, maxILI, maxISI):
+def get_ratid_scantime(rats, fname, this_lick, act, maxILI, maxISI):
     try:
         with open(fname, "r") as f:
             rat, scantime, *dummies = f.read().strip().split("\t")
