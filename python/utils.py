@@ -29,11 +29,12 @@ def get_ratid_scantime(fname, this_lick, act, maxILI, maxISI):
         else:
             rat_obj = rats[rat]
             if act:
-                if this_lick - rat_obj.last_act_licks["time"] > maxILI and this_lick - scantime > maxISI:
-                    rat = "ratUnknown"
+                last_lick = rat_obj.last_act_licks["time"]
             else:
-                if this_lick - rat_obj.last_inact_licks["time"] > maxILI and this_lick - scantime > maxISI:
-                    rat = "ratUnknown"
+                last_lick = rat_obj.last_inact_licks["time"]
+            
+            if this_lick - last_lick > maxILI and this_lick - scantime > maxISI:
+                rat = "ratUnknown"
             
     except KeyError:
         print("error from get_ratid_scantime")

@@ -44,7 +44,6 @@ ch.setFormatter(formatter)
 logger.addHandler(fh)
 logger.addHandler(ch)
 
-
 parser=argparse.ArgumentParser()
 parser.add_argument('-schedule',  type=str, default="vr")
 parser.add_argument('-ratio',  type=int, default=10)
@@ -156,8 +155,10 @@ while lapsed < sessionLength:
         lapsed = time.time() - sTime
 
         if GPIO.input(FORWARD_LIMIT_BTN):
+            # payload to send to slack
             payload = {'text': '{} SYRINGE EMPTIED!!! PLEASE RELOAD'.format(devID)}
             send_message(payload)
+
             reload_syringe()
             FORWARD_LIMIT_REACHED = True
 
@@ -198,21 +199,15 @@ while lapsed < sessionLength:
                     if rat.touch_counter >= rat.next_ratio and rat.ratid != "ratUnknown":
                         rat.incr_rewards()
                         rat.reset_touch_counter()
-
                         # don't delete this line
                         pumptimedout[ratid] = True
 
                         pumpTimer = Timer(timeout, resetPumpTimeout, [ratid] )
-
                         print("timeout on " + rat.ratid)
                         pumpTimer.start()
 
-                        # if not FORWARD_LIMIT_REACHED:
                         subprocess.call('sudo python ' + './blinkenlights.py -reward_happened True&', shell=True)
-                        # if FORWARD_LIMIT_REACHED:
-                        #     rat.increase_syringe_empty()
-                        #     FORWARD_LIMIT_REACHED = False
-                        # else:
+
                         dlogger.logEvent(rat.ratid, time.time()- scantime, "REWARD", time.time() - sTime)
                         mover = PumpMove()
                         mover.move("forward", step)                            
@@ -274,11 +269,9 @@ for rat_key, rat_rfid in zip(["ratID1","ratID2","ratID0"], [rat1ID, rat2ID, rat0
     rat = rats[rat_rfid]
     data_dict[rat_key] = [rat_rfid, date, d_time, devID, sesID, schedule_to, \
                             sessionLength, rat.active_licks, rat.inactive_licks, \
-                                rat.syringe_empty, rat.rewards]
-
+                                rat.rewards,rat.syringe_empty]
 
 LickLogger.finalLog(finallog_fname, data_dict, rfid_file)
-
 
 print(str(devID) +  "Session" + str(sesID) + " Done!\n")
 RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
