@@ -83,7 +83,7 @@
    | 5V DC | **Pi** - any 5V pin |
 
 ## Resources
-   [Raspberry Pi Stepper Motor Tutorial](https://www.rototron.info/raspberry-pi-stepper-motor-tutorial/)
-   [Raspberry Pi Stepper Motor Control with nema17](https://makersportal.com/blog/raspberry-pi-stepper-motor-control-with-nema-17)
-   [OpenSourceSyringePump](http://cavarnon.com/syringepump)
-   [How to Control a stepper motor with DRV8825 driver and Arduino](https://www.makerguides.com/drv8825-stepper-motor-driver-arduino-tutorial/)
+   [Raspberry Pi Stepper Motor Tutorial](https://www.rototron.info/raspberry-pi-stepper-motor-tutorial/)  
+   [Raspberry Pi Stepper Motor Control with nema17](https://makersportal.com/blog/raspberry-pi-stepper-motor-control-with-nema-17)  
+   [OpenSourceSyringePump](http://cavarnon.com/syringepump)  
+   [How to Control a stepper motor with DRV8825 driver and Arduino](https://www.makerguides.com/drv8825-stepper-motor-driver-arduino-tutorial/)  
