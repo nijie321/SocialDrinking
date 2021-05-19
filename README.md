@@ -36,3 +36,48 @@
    **check_empty_program.sh**: a script that check the size of every python file in the python/ directory. If one or more files are empty the script then reclone the entire repository.
 
    **check_network.sh**: a script that check the network connection right after the device boots up and ask user for action when the device was not able to connect to network.
+
+## Parts and GPIO Pin Connections Table
+
+   [DRV8834 Low-Voltage Stepper Motor Driver](https://www.pololu.com/product/2134), [Stepper Motor](https://www.pololu.com/product/2267), [Belker Universal AC Adapter 3-12V](https://www.amazon.com/Belker-Adjustable-Universal-Household-Electronics/dp/B07NKZCWT1/ref=asc_df_B07NKZCWT1/?tag=hyprod-20&linkCode=df0&hvadid=366402536789&hvpos=&hvnetw=g&hvrand=9548953669677245441&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9013532&hvtargid=pla-800552094134&psc=1&tag=&ref=&adgrpid=75347436439&hvpone=&hvptwo=&hvadid=366402536789&hvpos=&hvnetw=g&hvrand=9548953669677245441&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9013532&hvtargid=pla-800552094134)
+   | Pins on the driver | GPIO pin slot on the Pi, external power supply, and the stepper motor|
+   |--------------------|------------------------|
+   |      VMOT         |      **AC Adapter** - positive end of LED Terminal Adapter    |
+   |     GND |   **AC Adapter** - negative end of LED Terminal Adapter |
+   | B2, B1, A1, A2 |    **Stepper Motor** - Black, Green, Red, and Blue wire respectively      |
+   |      GND |    **Pi** - Any GND pin                |
+   |      M0, M1 | **Pi** - GPIO 17 and 22       |
+   |     SLP | **Pi** - Any 3v3 pin          |
+   |      STEP | **Pi** - GPIO 6            |
+   |      DIR | **Pi** - GPIO 26 |
+   
+   [Adafruit 12-Key Capacitive Touch Sensor - MPR121](https://www.adafruit.com/product/1982)
+   | Pins on the driver | GPIO pin slot on the Pi and external wires|
+   |--------------------|------------------------|
+   |  SCL, SDA | **Pi** - GPIO 3 and 2 respectively |
+   |  3Vo | **Pi** - Any 3v3 pin|
+   |  GND | **Pi** - Any GND pin|
+   |  0 | **external wire** - inactive wire|
+   |  1 | **external wire** - active wire|
+   
+   
+   [Limit Switch](https://www.amazon.com/MXRS-Hinge-Momentary-Button-Switch/dp/B07MW2RPJY/ref=lp_5739467011_1_7)
+   | Pins on the driver | GPIO pin slot on the Pi and external wires|
+   |--------------------|------------------------|
+   |  Normally Open (NO) | **Pi** - any GND pin|
+   |  Forward Limit - Contact Point (C) | **Pi** - GPIO 24|
+   |  Backward Limit - Contact Point (C) | **Pi** - GPIO 23|
+
+   [Push Button](https://www.amazon.com/DAOKI-Miniature-Momentary-Tactile-Quality/dp/B01CGMP9GY/ref=asc_df_B01CGMP9GY/?tag=hyprod-20&linkCode=df0&hvadid=309774137275&hvpos=&hvnetw=g&hvrand=7843520885449353644&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9013532&hvtargid=pla-640514760452&psc=1)
+   | Pins on the driver | GPIO pin slot on the Pi|
+   |--------------------|------------------------|
+   | Forward Button | **Pi** - GPIO 5|
+   | Backward Button | **Pi** - GPIO 27|
+   **Connect resistor and GND correspondingly**
+   
+   [Pixel Ring](https://www.adafruit.com/product/1643)
+   | Pins on the driver | GPIO pin slot on the Pi|
+   |--------------------|------------------------|
+   | IN | **Pi** - GPIO 18|
+   | GND | **Pi** - any GND pin |
+   | 5V DC | **Pi** - any 5V pin |
