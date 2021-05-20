@@ -3,25 +3,16 @@
 import sys
 import time
 import subprocess
-import os
 from ids import IDS
 from gpiozero import Button
 from pump_move import PumpMove
 from gpiozero import DigitalInputDevice
-
 from config import DATA_DIR, DATA_PREFIX, COMMAND_IDS, ROOT, get_sessioninfo
-
 import argparse
-
 from PumpCalibration import pump_calibration
-
 import logging
 
-
-
 # logging config
-
-# logger
 logger = logging.getLogger('main_log')
 logger.setLevel(logging.DEBUG)
 
@@ -42,7 +33,6 @@ logger.addHandler(fh)
 logger.addHandler(ch)
 # --------------------------------------------------------------------
 
-
 parser=argparse.ArgumentParser()
 parser.add_argument('-test',  type=bool, default=False)
 
@@ -60,7 +50,7 @@ motor_step = ids.step
 
 sTime=time.time()
 
-
+# constant for pump calibration program and update github chip
 PUMP_CALIBRATION = False
 UPDATE_REPO = False
 
@@ -77,7 +67,6 @@ if UPDATE_REPO:
     sys.exit()
 
 if not PUMP_CALIBRATION:
-
     sessioninfo = get_sessioninfo(RatID)
 
     while(len(sessioninfo) == 0):
@@ -87,6 +76,7 @@ if not PUMP_CALIBRATION:
         
     sessioninfo = sessioninfo[0]
 
+    
     mover = PumpMove()
     forwardbtn = Button("GPIO5")
     backwardbtn = Button("GPIO27")
@@ -121,6 +111,7 @@ if not PUMP_CALIBRATION:
 
     print("Run {} {} for {} hour \n".format(schedule, str(ratio), str(int(sessionLength/3600))))
 
+
 def scan_rats():
     rat1 = input("please scan rat1\n")[-8:]
     time.sleep(1) # delay for time to get the next rat
@@ -131,14 +122,13 @@ def scan_rats():
 
     return rat1, rat2
 
+
 def record_data(fname, mode ,record):
     try:
         with open(fname, mode) as f:
             f.write(record)
     except:
         logger.exception("unable to open filename %s", fname)
-    # except OSError:
-    #     print("unable to open {}".format(fname))
 
 
 print(datetime)
@@ -155,13 +145,6 @@ def overwrite_id_file(rat1, rat2, poke_counts):
 
 
 file_format = "{}\t{}\t{}\t{}\t{}\n"
-def write_header():
-    try:
-        with open(RFIDFILE, "w+") as f:
-            f.write(file_format.format("rfid", "time", "act_inact", "lapsed", "poke_count"))
-    except:
-        logger.exception("unable to open the file")
-
 
 if PUMP_CALIBRATION:
     logger.info("pump test started")
@@ -193,7 +176,6 @@ else:
                     " &",
                     shell=True
                     )
-    # subprocess.call("python3 operant_test.py -schedule {} -ratio {} -sessionLength {} -rat1ID {} -rat2ID {} -timeout {} &".format(schedule, str(ratio), str(sessionLength), rat1, rat2, str(timeout), shell=True))
 
     poke_counts = {rat1:{"act": 0, "inact": 0}, rat2:{"act":0, "inact":0}}
 
@@ -209,7 +191,7 @@ else:
             # when the input encounter an end of line before reading any input
             continue
         try:
-
+            # if the length of id is 10, then it's a inactive poke
             if (len(rfid)==10):
                 temp_rfid = rfid[-8:]
                 poke_counts[temp_rfid]["inact"] = poke_counts[temp_rfid]["inact"] + 1
@@ -217,7 +199,8 @@ else:
                 print(record)
                 record_data(fname=ROOT+"/_inactive",mode="w+",record=record)
                 record_data(fname=RFIDFILE, mode="a+", record=record)
-                    
+            
+            # if the length of id is 8, then it's a active poke
             if (len(rfid)==8):
                 poke_counts[rfid]["act"] = poke_counts[rfid]["act"] + 1
                 record = file_format.format(rfid, str(time.time()), "active", str(lapsed), str(poke_counts[rfid]["act"]))

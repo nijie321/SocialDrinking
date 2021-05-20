@@ -1,27 +1,26 @@
 #!/usr/bin/env python3
 
-import pigpio
-from PigpioStepperMotor import StepperMotor
-import sys
+# standard libraries
 import argparse
 import time
 from threading import Timer
-import RPi.GPIO as gpio
-from datalogger import LickLogger
 import subprocess
-import os
 import random
+import logging
+
+# self-define libraries
+from datalogger import LickLogger  # library for log data
+from pump_move import PumpMove # Class for controling the pump
+from slackbot import send_message # function for sending message in Slack
+from RatActivityCouter import RatActivityCounter
+from utils import reload_syringe, get_ratid_scantime # other utilities
+
+# third-party libraries
+import pigpio
 import board # MPR121
 import busio # MPR121
-import adafruit_mpr121
-import ids
-from pump_move import PumpMove
-# from gpiozero import DigitalInputDevice
-import RPi.GPIO as GPIO
-from RatActivityCouter import RatActivityCounter
-import logging
-from slackbot import send_message
-from utils import reload_syringe, get_ratid_scantime #, houselight_check
+import adafruit_mpr121 # adafruit library for touch sensor
+import RPi.GPIO as gpio
 
 
 # logger
@@ -273,18 +272,21 @@ formatted_schedule = schedule+str(ratio)+'TO'+str(timeout)+"_"+ rat1ID+"_"+rat2I
 schedule_to = schedule+str(ratio)+'TO'+str(timeout)
 finallog_fname = "Soc_{}_{}_{}_S{}_{}_{}_summary.tab".format(date,d_time,devID,sesID,formatted_schedule,sessionLength)
 
+# collect all data and log
 data_dict = {}
 for rat_key, rat_rfid in zip(["ratID1","ratID2","ratID0"], [rat1ID, rat2ID, rat0ID]):
     rat = rats[rat_rfid]
     data_dict[rat_key] = [rat_rfid, date, d_time, devID, sesID, schedule_to, \
                             sessionLength, rat.active_licks, rat.inactive_licks, \
                                 rat.rewards,rat.syringe_empty]
-
 LickLogger.finalLog(finallog_fname, data_dict, rfid_file)
 
+# show data one last time
 print(str(devID) +  "Session" + str(sesID) + " Done!\n")
 RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
                         rats[rat1ID],rats[rat2ID],rats[rat0ID], "final")
 
+# call bash script, which sync the data file and reboot device
+# see 'rsync.sh' file in wifi-network folder for details
 subprocess.call('/home/pi/openbehavior/PeerPub/wifi-network/rsync.sh &', shell=True)
 print(devID+  "Session"+ str(sesID) + " Done!\n")
