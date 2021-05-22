@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 
+# standard libraries
 import sys
 import time
 import subprocess
-from ids import IDS
+import argparse
+import logging
+
+# third-party libraries
 from gpiozero import Button
 from pump_move import PumpMove
 from gpiozero import DigitalInputDevice
+
+# self-define libraries
 from config import DATA_DIR, DATA_PREFIX, COMMAND_IDS, ROOT, get_sessioninfo
-import argparse
 from PumpCalibration import pump_calibration
-import logging
+from ids import IDS
 
 # logging config
 logger = logging.getLogger('main_log')
@@ -24,7 +29,8 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.ERROR)
 
 # formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)
 ch.setFormatter(formatter)
 
@@ -33,14 +39,14 @@ logger.addHandler(fh)
 logger.addHandler(ch)
 # --------------------------------------------------------------------
 
-parser=argparse.ArgumentParser()
+parser = argparse.ArgumentParser()
 parser.add_argument('-test',  type=bool, default=False)
 
-args=parser.parse_args()
+args = parser.parse_args()
 
-# get date and time 
-datetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-date=time.strftime("%Y-%m-%d", time.localtime())
+# get date and time
+datetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+date = time.strftime("%Y-%m-%d", time.localtime())
 
 # get device and session ids
 ids = IDS()
@@ -48,7 +54,7 @@ ids.sessionIncrement()
 
 motor_step = ids.step
 
-sTime=time.time()
+sTime = time.time()
 
 # constant for pump calibration program and update github chip
 PUMP_CALIBRATION = False
@@ -63,7 +69,8 @@ if RatID[-1:] == "0c" or RatID[-2:] == "fe":
     UPDATE_REPO = True
 
 if UPDATE_REPO:
-    subprocess.call("bash /home/pi/openbehavior/PeerPub/utility_script/update_repo.sh &", shell=True)
+    subprocess.call(
+        "bash /home/pi/openbehavior/PeerPub/utility_script/update_repo.sh &", shell=True)
     sys.exit()
 
 if not PUMP_CALIBRATION:
@@ -73,10 +80,8 @@ if not PUMP_CALIBRATION:
         RatID = input("command ID not found please rescan the id: ")[-8:]
         sessioninfo = get_sessioninfo(RatID)
 
-        
     sessioninfo = sessioninfo[0]
 
-    
     mover = PumpMove()
     forwardbtn = Button("GPIO5")
     backwardbtn = Button("GPIO27")
@@ -107,23 +112,27 @@ if not PUMP_CALIBRATION:
         sessionLength = int(sessioninfo[4])
 
     # file to store RFID scann times
-    RFIDFILE = DATA_DIR + DATA_PREFIX + date + "_" + str(ids.devID)+ "_S"+str(ids.sesID)+ "_" + str(sessionLength) + "_RFID.csv"
+    RFIDFILE = DATA_DIR + DATA_PREFIX + date + "_" + \
+        str(ids.devID) + "_S"+str(ids.sesID) + \
+        "_" + str(sessionLength) + "_RFID.csv"
 
-    print("Run {} {} for {} hour \n".format(schedule, str(ratio), str(int(sessionLength/3600))))
+    print("Run {} {} for {} hour \n".format(
+        schedule, str(ratio), str(int(sessionLength/3600))))
 
 
 def scan_rats():
     rat1 = input("please scan rat1\n")[-8:]
-    time.sleep(1) # delay for time to get the next rat
+    time.sleep(1)  # delay for time to get the next rat
     rat2 = input("please scan rat2\n")[-8:]
 
     while(rat1 == rat2):
-        rat2 = input("The IDs of rat1 and rat2 are identical, please scan rat2 again\n")[-8:]
+        rat2 = input(
+            "The IDs of rat1 and rat2 are identical, please scan rat2 again\n")[-8:]
 
     return rat1, rat2
 
 
-def record_data(fname, mode ,record):
+def record_data(fname, mode, record):
     try:
         with open(fname, mode) as f:
             f.write(record)
@@ -134,13 +143,17 @@ def record_data(fname, mode ,record):
 print(datetime)
 # overwrite the id files before the program start
 # this will remove the rfid from previous sessions
+
+
 def overwrite_id_file(rat1, rat2, poke_counts):
     with open("/home/pi/_inactive", "w") as f:
-        record = file_format.format(rat1, str(time.time()), "inactive", str(time.time()-sTime), str(poke_counts[rat1]["inact"]))
+        record = file_format.format(rat1, str(time.time()), "inactive", str(
+            time.time()-sTime), str(poke_counts[rat1]["inact"]))
         f.write(record)
 
     with open("/home/pi/active", "w") as f:
-        record = file_format.format(rat2, str(time.time()), "active", str(time.time()-sTime), str(poke_counts[rat2]["act"]))
+        record = file_format.format(rat2, str(time.time()), "active", str(
+            time.time()-sTime), str(poke_counts[rat2]["act"]))
         f.write(record)
 
 
@@ -152,60 +165,63 @@ if PUMP_CALIBRATION:
 else:
     rat1, rat2 = scan_rats()
 
-    print("Session started\nSchedule:{}{}TO{}\nSession Length:{}sec\n",schedule, str(ratio), str(timeout), str(sessionLength))
+    print("Session started\nSchedule:{}{}TO{}\nSession Length:{}sec\n",
+          schedule, str(ratio), str(timeout), str(sessionLength))
 
     # start time
-    sTime=time.time()
-    lapsed=0
+    sTime = time.time()
+    lapsed = 0
 
     # delete mover to prevent overheating
     del(mover)
 
     logger.info("called operant")
-    subprocess.call("python3 operant_test.py " + \
-                    "-schedule " + schedule + \
-                    " -ratio " + str(ratio)  + \
-                    " -sessionLength " + str(sessionLength) + \
-                    " -rat1ID " + str(rat1) + \
-                    " -rat2ID " + str(rat2) + \
-                    " -timeout " + str(timeout) + \
-                    " -rfidFile " + RFIDFILE + \
-                    " -devID " + ids.devID + \
-                    " -sesID " + str(ids.sesID) + \
-                    " -step " + str(motor_step) + \
+    subprocess.call("python3 operant_test.py " +
+                    "-schedule " + schedule +
+                    " -ratio " + str(ratio) +
+                    " -sessionLength " + str(sessionLength) +
+                    " -rat1ID " + str(rat1) +
+                    " -rat2ID " + str(rat2) +
+                    " -timeout " + str(timeout) +
+                    " -rfidFile " + RFIDFILE +
+                    " -devID " + ids.devID +
+                    " -sesID " + str(ids.sesID) +
+                    " -step " + str(motor_step) +
                     " &",
                     shell=True
                     )
 
-    poke_counts = {rat1:{"act": 0, "inact": 0}, rat2:{"act":0, "inact":0}}
+    poke_counts = {rat1: {"act": 0, "inact": 0}, rat2: {"act": 0, "inact": 0}}
 
     overwrite_id_file(rat1, rat2, poke_counts)
 
     logger.info("while loop started")
 
     while lapsed < sessionLength:
-        lapsed=time.time()-sTime
+        lapsed = time.time()-sTime
         try:
-            rfid=input("rfid waiting\n")
+            rfid = input("rfid waiting\n")
         except EOFError:
             # when the input encounter an end of line before reading any input
             continue
         try:
             # if the length of id is 10, then it's a inactive poke
-            if (len(rfid)==10):
+            if (len(rfid) == 10):
                 temp_rfid = rfid[-8:]
                 poke_counts[temp_rfid]["inact"] = poke_counts[temp_rfid]["inact"] + 1
-                record = file_format.format(temp_rfid, str(time.time()), "inactive", str(lapsed), str(poke_counts[temp_rfid]["inact"]))
+                record = file_format.format(temp_rfid, str(time.time()), "inactive", str(
+                    lapsed), str(poke_counts[temp_rfid]["inact"]))
                 print(record)
-                record_data(fname=ROOT+"/_inactive",mode="w+",record=record)
+                record_data(fname=ROOT+"/_inactive", mode="w+", record=record)
                 record_data(fname=RFIDFILE, mode="a+", record=record)
-            
+
             # if the length of id is 8, then it's a active poke
-            if (len(rfid)==8):
+            if (len(rfid) == 8):
                 poke_counts[rfid]["act"] = poke_counts[rfid]["act"] + 1
-                record = file_format.format(rfid, str(time.time()), "active", str(lapsed), str(poke_counts[rfid]["act"]))
+                record = file_format.format(rfid, str(time.time()), "active", str(
+                    lapsed), str(poke_counts[rfid]["act"]))
                 print(record)
-                record_data(fname=ROOT+"/_active",mode="w+",record=record)
-                record_data(fname=RFIDFILE,mode="a+", record=record)
+                record_data(fname=ROOT+"/_active", mode="w+", record=record)
+                record_data(fname=RFIDFILE, mode="a+", record=record)
         except:
             logger.exception("maybe KeyError?")
