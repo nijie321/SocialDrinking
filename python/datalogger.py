@@ -2,7 +2,6 @@
 import os
 import time
 import string
-# from ids import *
 from config import DATA_DIR, DATA_PREFIX
 
 
@@ -20,9 +19,6 @@ class LickLogger:
         date=time.strftime("%Y-%m-%d_%H_%M_%S", time.localtime())
         self.datafile = DATA_DIR + DATA_PREFIX + date + "_" + str(self.devID) + '_S' + str(self.sessID) +  "_" + schedule + "_" + str(ratIDs) + '_' + str(sessLen) +  '.csv'
         print ("\nData file location:\n", self.datafile)
-        # open data file
-        # with open(self.datafile,"a") as f:
-        #     f.write("RatID\tRfidSec\tdate\tstart_time\tboxid\tEventType\t"+schedule+"\tlapsedSec\n")
 
     def logEvent(self, rat, eventSec, eventType, timeLapsed, ratio=0):
         # Create output string
@@ -33,11 +29,10 @@ class LickLogger:
 
     @staticmethod
     def finalLog(fname,data_dict,rfid_file):
-        print("data dict")
-        print(data_dict)
         ratids = [data_dict["ratID1"][0], data_dict["ratID2"][0]]
         poke_counts = {ratids[0]:{"act":0, "inact": 0}, ratids[1]:{"act":0, "inact":0}}
 
+        # read the poke counts from rfid files
         with open(rfid_file, "r") as f:
             lines = f.readlines()[1:]
             filtered = list(map(helper, lines))
@@ -47,6 +42,7 @@ class LickLogger:
                 else:
                     poke_counts[rid]["inact"] = int(poke_count.strip())
 
+        # summary .tab file
         with open(DATA_DIR+ "/" + fname, "a+") as f:
             print(DATA_DIR + "/" + fname)
             ID1_str = (("{}\t"*13).format(*data_dict["ratID1"], poke_counts[ratids[0]]["act"], poke_counts[ratids[0]]["inact"])) + "\n"

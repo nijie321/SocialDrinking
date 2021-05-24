@@ -13,7 +13,7 @@ from pump_move import PumpMove
 from gpiozero import DigitalInputDevice
 
 # self-define libraries
-from config import DATA_DIR, DATA_PREFIX, COMMAND_IDS, ROOT, get_sessioninfo
+from config import DATA_DIR, DATA_PREFIX, ROOT, get_sessioninfo
 from PumpCalibration import pump_calibration
 from ids import IDS
 
@@ -52,6 +52,7 @@ date = time.strftime("%Y-%m-%d", time.localtime())
 ids = IDS()
 ids.sessionIncrement()
 
+# speed for the stepper motor
 motor_step = ids.step
 
 sTime = time.time()
@@ -60,14 +61,20 @@ sTime = time.time()
 PUMP_CALIBRATION = False
 UPDATE_REPO = False
 
+# the inactive and active antenna scan the RFID in different format
+# inactive scans 10 alpha-numeric characters, active scans 8
+# here, we only get the last 8 characters
 RatID = input("please scan a command RFID\n")[-8:]
 
+
+# check the last 2 characters
 if RatID[-2:] == "6b" or RatID[-2:] == "ba":
     PUMP_CALIBRATION = True
 
-if RatID[-1:] == "0c" or RatID[-2:] == "fe":
+if RatID[-2:] == "0c" or RatID[-2:] == "fe":
     UPDATE_REPO = True
 
+# update github repo. see 'update_repo.sh' for details
 if UPDATE_REPO:
     subprocess.call(
         "bash /home/pi/openbehavior/PeerPub/utility_script/update_repo.sh &", shell=True)
