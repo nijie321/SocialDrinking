@@ -37,6 +37,9 @@
 
    **check_network.sh**: a script that check the network connection right after the device boots up and ask user for action when the device was not able to connect to network.
 
+## Program Overview
+The main (main_test.py) program is used to read/scan the pre-configured command RFID stored in 'session_configuration.csv' file under python directory. After the command ID is scaned, the program proceed to ask for scanning rat's ID. The time between scanning rat's ID and command ID is the time for adjusting the pump position (e.g. after the rat's ID are scanned, the pump adjustment are disabled to avoid driver board overheating). After the rat's ID are scanned, the main program spawns a new operant (operant_test.py) program by passing in the necessary arguments and run it in the background. Note that because the operant program is a thread, the main program is kept alive (e.g. running in parallel with the operant program). The main program is tasked with reading the rat's ID when they poke their head into the active or inactve spout (disctinguished by the length of characters: 10 for inactive poke and 8 for active poke).
+
 ## Parts and GPIO Pin Connections Table
 
    [DRV8834 Low-Voltage Stepper Motor Driver](https://www.pololu.com/product/2134), [Stepper Motor](https://www.pololu.com/product/2267), [Belker Universal AC Adapter 3-12V](https://www.amazon.com/Belker-Adjustable-Universal-Household-Electronics/dp/B07NKZCWT1/ref=asc_df_B07NKZCWT1/?tag=hyprod-20&linkCode=df0&hvadid=366402536789&hvpos=&hvnetw=g&hvrand=9548953669677245441&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9013532&hvtargid=pla-800552094134&psc=1&tag=&ref=&adgrpid=75347436439&hvpone=&hvptwo=&hvadid=366402536789&hvpos=&hvnetw=g&hvrand=9548953669677245441&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9013532&hvtargid=pla-800552094134)
