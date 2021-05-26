@@ -56,7 +56,7 @@ parser.add_argument('-sesID', type=int)
 parser.add_argument('-step', type=int)
 args=parser.parse_args()
 
-# exp setting
+# experiment setting
 schedule=args.schedule
 ratio=args.ratio
 sessionLength=args.sessionLength
@@ -72,7 +72,7 @@ sesID = args.sesID
 rfid_file=args.rfidFile
 
 ## initiate pump motor
-pi = pigpio.pi()
+# pi = pigpio.pi()
 
 # Create I2C bus.
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -84,17 +84,17 @@ gpio.setwarnings(False)
 gpio.setmode(gpio.BCM)
 
 # GPIO usage 
-TIR = int(16) # Pin 36
-SW1 = int(26) # Pin 37
-SW2 = int(20) # Pin 38
-TOUCHLED = int(12) #pin 32
-MOTIONLED= int(6) #pin 31
+# TIR = int(16) # Pin 36
+# SW1 = int(26) # Pin 37
+# SW2 = int(20) # Pin 38
+# TOUCHLED = int(12) #pin 32
+# MOTIONLED= int(6) #pin 31
 
-# Setup switch pins
-gpio.setup(SW1, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.setup(SW2, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.setup(TIR, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.setup(TOUCHLED, gpio.OUT)
+# # Setup switch pins
+# gpio.setup(SW1, gpio.IN, pull_up_down=gpio.PUD_DOWN)
+# gpio.setup(SW2, gpio.IN, pull_up_down=gpio.PUD_DOWN)
+# gpio.setup(TIR, gpio.IN, pull_up_down=gpio.PUD_DOWN)
+# gpio.setup(TOUCHLED, gpio.OUT)
 
 # get date and time 
 datetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -102,6 +102,7 @@ date=time.strftime("%Y-%m-%d", time.localtime())
 
 # Initialize data logger 
 dlogger = LickLogger(devID, sesID)
+# create a new data file to store the data
 dlogger.createDataFile(schedule="{}{}TO{}".format(schedule,str(ratio),str(timeout)) , ratIDs=rat1ID+"_"+rat2ID, sessLen=sessionLength)
 
 # Get start time
@@ -111,12 +112,11 @@ sTime = time.time()
 FORWARD_LIMIT_BTN = 24
 FORWARD_LIMIT_REACHED = False
 # BACKWARD_LIMIT_BTN = 23
-FORWARD_COUNTER = 0
-touchcounter={rat0ID:0,rat1ID:0, rat2ID:0}
-nextratio={rat0ID:0,rat1ID:ratio, rat2ID:ratio}
-rew={rat0ID:0, rat1ID:0, rat2ID:0}
-act={rat0ID:0, rat1ID:0, rat2ID:0}
-ina={rat0ID:0, rat1ID:0, rat2ID:0}
+# touchcounter={rat0ID:0,rat1ID:0, rat2ID:0}
+# nextratio={rat0ID:0,rat1ID:ratio, rat2ID:ratio}
+# rew={rat0ID:0, rat1ID:0, rat2ID:0}
+# act={rat0ID:0, rat1ID:0, rat2ID:0}
+# ina={rat0ID:0, rat1ID:0, rat2ID:0}
 
 lastActiveLick={rat0ID:{"time":float(sTime), "scantime": 0}, rat1ID:{"time":float(sTime), "scantime":0}, rat2ID:{"time":float(sTime), "scantime":0}}
 lastInactiveLick={rat0ID:{"time":float(sTime), "scantime": 0}, rat1ID:{"time":float(sTime), "scantime":0}, rat2ID:{"time":float(sTime), "scantime":0}}
@@ -155,6 +155,7 @@ def houselight_check():
 
 while lapsed < sessionLength:
     try:
+        # check if the time is between 9pm and 9am. If so, turn on the house light
         houselight_check()
 
         time.sleep(0.05) # allow 20 licks per sec

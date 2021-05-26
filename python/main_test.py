@@ -76,11 +76,14 @@ if RatID[-2:] == "0c" or RatID[-2:] == "fe":
 
 # update github repo. see 'update_repo.sh' for details
 if UPDATE_REPO:
+    # after update, the pi will restart within 1 minutes
     subprocess.call(
         "bash /home/pi/openbehavior/PeerPub/utility_script/update_repo.sh &", shell=True)
+    # exit the program
     sys.exit()
 
 if not PUMP_CALIBRATION:
+    # get the session information (timeout, ratio, nexratio, etc...) from 'session_configuration.csv' file under python directory
     sessioninfo = get_sessioninfo(RatID)
 
     while(len(sessioninfo) == 0):
@@ -107,6 +110,7 @@ if not PUMP_CALIBRATION:
     forwardbtn.when_pressed = forward
     backwardbtn.when_pressed = backward
 
+    # ignore the if part (for test)
     if args.test:
         schedule = "fr"
         timeout = 10
@@ -170,6 +174,7 @@ if PUMP_CALIBRATION:
     logger.info("pump test started")
     pump_calibration(motor_step, "{}_steps".format(ids.devID))
 else:
+    # get rats RFID
     rat1, rat2 = scan_rats()
 
     print("Session started\nSchedule:{}{}TO{}\nSession Length:{}sec\n",
@@ -198,8 +203,10 @@ else:
                     shell=True
                     )
 
+    # initialize poke counts
     poke_counts = {rat1: {"act": 0, "inact": 0}, rat2: {"act": 0, "inact": 0}}
 
+    # empty the information from previous session
     overwrite_id_file(rat1, rat2, poke_counts)
 
     logger.info("while loop started")
@@ -219,6 +226,7 @@ else:
                 record = file_format.format(temp_rfid, str(time.time()), "inactive", str(
                     lapsed), str(poke_counts[temp_rfid]["inact"]))
                 print(record)
+                # write the poke information to file
                 record_data(fname=ROOT+"/_inactive", mode="w+", record=record)
                 record_data(fname=RFIDFILE, mode="a+", record=record)
 
@@ -228,6 +236,7 @@ else:
                 record = file_format.format(rfid, str(time.time()), "active", str(
                     lapsed), str(poke_counts[rfid]["act"]))
                 print(record)
+                # write the poke information to file
                 record_data(fname=ROOT+"/_active", mode="w+", record=record)
                 record_data(fname=RFIDFILE, mode="a+", record=record)
         except:
