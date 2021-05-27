@@ -1,6 +1,4 @@
 #!/usr/bin/python3 
-import os
-import time
 from config import ROOT
 import json
 import sys

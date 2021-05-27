@@ -11,9 +11,8 @@ import logging
 # self-define libraries
 from datalogger import LickLogger  # library for log data
 from pump_move import PumpMove # Class for controling the pump
-from slackbot import send_message # function for sending message in Slack
 from RatActivityCouter import RatActivityCounter
-from utils import reload_syringe, get_ratid_scantime # other utilities
+from utils import reload_syringe, get_ratid_scantime, send_message # other utilities
 
 # third-party libraries
 import pigpio
@@ -112,11 +111,6 @@ sTime = time.time()
 FORWARD_LIMIT_BTN = 24
 FORWARD_LIMIT_REACHED = False
 # BACKWARD_LIMIT_BTN = 23
-# touchcounter={rat0ID:0,rat1ID:0, rat2ID:0}
-# nextratio={rat0ID:0,rat1ID:ratio, rat2ID:ratio}
-# rew={rat0ID:0, rat1ID:0, rat2ID:0}
-# act={rat0ID:0, rat1ID:0, rat2ID:0}
-# ina={rat0ID:0, rat1ID:0, rat2ID:0}
 
 lastActiveLick={rat0ID:{"time":float(sTime), "scantime": 0}, rat1ID:{"time":float(sTime), "scantime":0}, rat2ID:{"time":float(sTime), "scantime":0}}
 lastInactiveLick={rat0ID:{"time":float(sTime), "scantime": 0}, rat1ID:{"time":float(sTime), "scantime":0}, rat2ID:{"time":float(sTime), "scantime":0}}

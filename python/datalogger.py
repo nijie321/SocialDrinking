@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-import os
 import time
-import string
 from config import DATA_DIR, DATA_PREFIX
 
 

@@ -1,27 +1,4 @@
-
-# import BASE_DIR from config
-# from config import BASE_DIR
-# print(BASE_DIR)
-
-
-# class Logger():
-#     def __init__(self,file_name):
-#         self.file_name = file_name
-#         self.data_str = ""
-
-#     def write_data_str(self, data):
-#         self.data_str += "{}{}".format(data, "\n")
-        
-    
-#     def save_file(self):
-#         with open(self.file_name, "a+") as f:
-#             f.write(self.data_str)
-            
-        
-        
-
 import time
-import string
 from config import DATA_DIR, DATA_PREFIX
 
 class LickLogger:

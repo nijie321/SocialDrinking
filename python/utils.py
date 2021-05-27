@@ -39,3 +39,14 @@ def reload_syringe():
     while BACKWARD_LIMIT.value != 1:
         mover.move("backward")
     del(mover)
+
+
+# Send Slack message
+def send_message(payload):
+    import requests
+    # webhook url file
+    webhook_url = ""
+    # file storing the webhook url
+    with open('/home/pi/webhook_url', 'r') as f:
+        webhook_url = f.read().strip()
+    requests.post(webhook_url, json=payload)
