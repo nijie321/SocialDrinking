@@ -162,7 +162,7 @@ def overwrite_id_file(rat1, rat2, poke_counts):
             time.time()-sTime), str(poke_counts[rat1]["inact"]))
         f.write(record)
 
-    with open("/home/pi/active", "w") as f:
+    with open("/home/pi/_active", "w") as f:
         record = file_format.format(rat2, str(time.time()), "active", str(
             time.time()-sTime), str(poke_counts[rat2]["act"]))
         f.write(record)
