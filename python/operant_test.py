@@ -183,10 +183,12 @@ while lapsed < sessionLength:
                 rat.incr_active_licks()
 
                 if FORWARD_LIMIT_REACHED:
+                    # record empty syringe data
                     dlogger.logEvent(rat.ratid, time.time(), "syringe empty", time.time() - sTime) 
                     rat.increase_syringe_empty()
                     FORWARD_LIMIT_REACHED = False
                 else:
+                    # record active lick data
                     dlogger.logEvent(rat.ratid, time.time() - rat.last_act_licks["scantime"], "ACTIVE", lapsed, rat.next_ratio) # add next ratio
 
                 rat.update_last_licks(thisActiveLick, scantime, act=True)
@@ -205,17 +207,21 @@ while lapsed < sessionLength:
                         # don't delete this line
                         pumptimedout[ratid] = True
 
+                        # spawn a temporary timer (thread)
                         pumpTimer = Timer(timeout, resetPumpTimeout, [ratid] )
                         print("timeout on " + rat.ratid)
                         pumpTimer.start()
 
                         subprocess.call('sudo python ' + './blinkenlights.py -reward_happened True&', shell=True)
 
+                        # record reward data
                         dlogger.logEvent(rat.ratid, time.time()- scantime, "REWARD", time.time() - sTime)
+                        # enable stepper motor, deliver reward, and disable it
                         mover = PumpMove()
                         mover.move("forward", step)                            
                         del(mover)
 
+                        # show colored information
                         RatActivityCounter.show_data(devID, sesID, sessionLength, schedule, lapsed, \
                                                 rats[rat1ID],rats[rat2ID],rats[rat0ID])
 
@@ -239,6 +245,7 @@ while lapsed < sessionLength:
                 rat.update_last_licks(thisInactiveLick, scantime, act=False)
             else:
                 rat.incr_inactive_licks()
+                # record inactive lick data
                 dlogger.logEvent(rat.ratid,time.time() - rat.last_inact_licks["scantime"], "INACTIVE", lapsed)
                 rat.update_last_licks(thisInactiveLick, scantime, act=False)
 
@@ -267,7 +274,7 @@ formatted_schedule = schedule+str(ratio)+'TO'+str(timeout)+"_"+ rat1ID+"_"+rat2I
 schedule_to = schedule+str(ratio)+'TO'+str(timeout)
 finallog_fname = "Soc_{}_{}_{}_S{}_{}_{}_summary.tab".format(date,d_time,devID,sesID,formatted_schedule,sessionLength)
 
-# collect all data and log
+# collect all data and make a final record
 data_dict = {}
 for rat_key, rat_rfid in zip(["ratID1","ratID2","ratID0"], [rat1ID, rat2ID, rat0ID]):
     rat = rats[rat_rfid]

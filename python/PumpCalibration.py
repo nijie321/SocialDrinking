@@ -8,7 +8,6 @@ import adafruit_mpr121
 from ids import IDS
 import time
 import math
-import subprocess
 import os
 file_dir = "/home/pi/SocialDrinking/{}"
 
@@ -55,6 +54,7 @@ def pump_calibration(step_size, fname):
 
             if act_count == 15:
                 response = input("please enter the amount measured (numeric value) or scan the command id again to exit: ").strip()
+                # if the same command RFID is scanned again, exit the while loop
                 if response[-2:] == '16' or response[-2:] == '89' or response[-2:] == 'ba':
                     break
                 else:
@@ -78,18 +78,15 @@ def pump_calibration(step_size, fname):
     del(mover)
 
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    # d_time = time.strftime("%Y-%m-%d", time.localtime())
     record = "{}\t"*3
 
     ids = IDS()
+    # print out the old/new steps after the calibration
     print("old step size: {}".format(old_step))
     print("new step size: {}".format(step))
-    ids.change_step(step)
 
-    # get latest git information
-    # command = "cd /home/pi/openbehavior/PeerPub/ && git log -1 --pretty=oneline"
-    # git_info = subprocess.Popen(command,shell=True, stdout=subprocess.PIPE) 
-    # git_info = git_info.stdout.read().decode('utf-8').strip()
+    # overwrite the old step size in 'peerpub_config.json' file
+    ids.change_step(step)
 
     f_specifiers = ""
     file_path = file_dir.format(fname)

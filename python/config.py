@@ -1,6 +1,8 @@
 BASE_DIR = "./SocialDrink"
 ROOT = "/home/pi"
+# /home/pi/SocialDrinking directory
 DATA_DIR = "{}/{}/".format(ROOT, "SocialDrinking")
+# each data file starts with Soc_
 DATA_PREFIX = "Soc_"
 CONFIG_FILE = "/home/pi/openbehavior/PeerPub/python/session_configuration.csv"
 
