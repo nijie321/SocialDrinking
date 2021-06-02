@@ -123,7 +123,7 @@ rats = {
 }
 ##############################################################
 
-FORWARD_LIMIT = gpio.setup(FORWARD_LIMIT_BTN, GPIO.IN, pull_up_down= GPIO.PUD_DOWN)
+FORWARD_LIMIT = gpio.setup(FORWARD_LIMIT_BTN, gpio.IN, pull_up_down= gpio.PUD_DOWN)
 
 pumptimedout={rat0ID:False, rat1ID:False, rat2ID:False}
 lapsed=0  # time since program start
