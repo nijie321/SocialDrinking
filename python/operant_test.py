@@ -123,7 +123,7 @@ rats = {
 }
 ##############################################################
 
-FORWARD_LIMIT = GPIO.setup(FORWARD_LIMIT_BTN, GPIO.IN, pull_up_down= GPIO.PUD_DOWN)
+FORWARD_LIMIT = gpio.setup(FORWARD_LIMIT_BTN, GPIO.IN, pull_up_down= GPIO.PUD_DOWN)
 
 pumptimedout={rat0ID:False, rat1ID:False, rat2ID:False}
 lapsed=0  # time since program start
@@ -157,7 +157,7 @@ while lapsed < sessionLength:
         act1 = mpr121.touched_pins[1]
         lapsed = time.time() - sTime
 
-        if GPIO.input(FORWARD_LIMIT_BTN):
+        if gpio.input(FORWARD_LIMIT_BTN):
             # payload to send to slack
             payload = {'text': '{} SYRINGE EMPTIED!!! PLEASE RELOAD'.format(devID)}
             send_message(payload)
