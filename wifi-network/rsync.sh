@@ -16,7 +16,7 @@ while [ `sudo ifconfig wlan0 |grep broadcast |wc -l` -ne 1 ]
 done
 
 # remove files older than 15 days
-rm `find /home/pi/SocialDrinking/* -mtime +15` 
+rm `find /home/pi/SocialDrinking/* -mtime +15 |grep -v update` 
 
 gzip -f /home/pi/SocialDrinking/*csv
 
