@@ -35,5 +35,5 @@ class IDS:
         f.close()
         
     def sessionIncrement(self):
-        self.sesID + 1
+        self.sesID += 1
         self.save_data()
