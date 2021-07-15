@@ -66,7 +66,13 @@ UPDATE_REPO = False
 # here, we only get the last 8 characters
 RatID = input("please scan a command RFID\n")[-8:]
 
-
+# sync data
+if RatID[-2:] == "94" or RatID[-2:] == "fa":
+    subprocess.call(
+        "bash /home/pi/openbehavior/PeerPub/wifi-network/rsync.sh", shell=True)
+    # exit the program
+    #sys.exit()
+    
 # check the last 2 characters
 if RatID[-2:] == "6b" or RatID[-2:] == "ba":
     PUMP_CALIBRATION = True
